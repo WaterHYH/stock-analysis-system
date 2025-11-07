@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>股票智能分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-title::before {
+            content: "🔍";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .conditions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .condition-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .condition-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .condition-item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .condition-item input[type="checkbox"]:checked + label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .condition-item label {
+            display: block;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .condition-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .condition-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .condition-item input[type="checkbox"]:checked + label .condition-desc {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .condition-item input[type="date"],
+        .condition-item input[type="number"] {
+            font-family: inherit;
+        }
+
+        .condition-item input[type="date"]:focus,
+        .condition-item input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .results-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .results-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .message {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .message::before {
+            content: "ℹ️";
+            display: block;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .results-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .results-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .results-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .results-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stock-symbol {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .drop-percentage {
+            font-weight: bold;
+        }
+
+        .drop-high {
+            color: #e74c3c;
+        }
+
+        .drop-medium {
+            color: #f39c12;
+        }
+
+        .drop-low {
+            color: #27ae60;
+        }
+
+        .condition-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e8f0fe;
+            color: #1967d2;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .conditions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-table {
+                font-size: 14px;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 股票智能分析系统</h1>
+            <p>基于历史数据的多维度股票筛选工具</p>
+        </div>
+
+        <div class="content">
+            <!-- 筛选条件区域 -->
+            <div class="filter-section">
+                <div class="filter-title">选择筛选条件</div>
+                
+                <form th:action="@{/stock-analysis/search}" method="get" onchange="updateParamsVisibility()">
+                    <div class="conditions-grid">
+                        <!-- 条件1: 低于历史最高值25% -->
+                        <div class="condition-item">
+                            <input type="checkbox" id="cond1" name="conditions" value="below_75_percent" 
+                                   th:checked="${selectedConditions != null && selectedConditions.contains('below_75_percent')}">
+                            <label for="cond1">
+                                <div class="condition-title">💎 超跌潜力股</div>
+                                <div class="condition-desc">筛选出比历史最高值低25%以上的股票，可能存在价值回归机会</div>
+                            </label>
+                        </div>
+
+                        <!-- 条件1的参数配置 -->
+                        <div class="condition-item" id="cond1-params" style="grid-column: span 2; display: none;">
+                            <label style="padding: 0;">
+                                <div class="condition-title" style="margin-bottom: 15px;">⚙️ 参数设置</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">开始日期（可选）</label>
+                                        <input type="date" name="startDate" th:value="${startDate}" 
+                                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                        <div style="font-size: 12px; color: #999; margin-top: 3px;">默认：全部历史数据</div>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">跌幅百分比（%）</label>
+                                        <input type="number" name="dropPercentage" th:value="${dropPercentage}" 
+                                               placeholder="默认25" min="1" max="99" step="1"
+                                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                        <div style="font-size: 12px; color: #999; margin-top: 3px;">范围：1-99%</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- 条件2: 高波动低位股 -->
+                        <div class="condition-item">
+                            <input type="checkbox" id="cond2" name="conditions" value="high_volatility_low_price"
+                                   th:checked="${selectedConditions != null && selectedConditions.contains('high_volatility_low_price')}">
+                            <label for="cond2">
+                                <div class="condition-title">📈 高波动低位股</div>
+                                <div class="condition-desc">半年内至少3次波动超20%，且当前处于低位，适合波段操作</div>
+                            </label>
+                        </div>
+
+                        <!-- 条件3: 连续上涨 -->
+                        <div class="condition-item">
+                            <input type="checkbox" id="cond3" name="conditions" value="continuous_rise"
+                                   th:checked="${selectedConditions != null && selectedConditions.contains('continuous_rise')}">
+                            <label for="cond3">
+                                <div class="condition-title">🚀 强势上涨股</div>
+                                <div class="condition-desc">最近10个交易日中有8天上涨，趋势强劲</div>
+                            </label>
+                        </div>
+
+                        <!-- 条件4: 接近年度最高点 -->
+                        <div class="condition-item">
+                            <input type="checkbox" id="cond4" name="conditions" value="near_year_high"
+                                   th:checked="${selectedConditions != null && selectedConditions.contains('near_year_high')}">
+                            <label for="cond4">
+                                <div class="condition-title">⭐ 创新高潜力股</div>
+                                <div class="condition-desc">距离年度最高价5%以内，可能突破新高</div>
+                            </label>
+                        </div>
+
+                        <!-- 条件5: 成交量激增 -->
+                        <div class="condition-item">
+                            <input type="checkbox" id="cond5" name="conditions" value="volume_surge"
+                                   th:checked="${selectedConditions != null && selectedConditions.contains('volume_surge')}">
+                            <label for="cond5">
+                                <div class="condition-title">🔥 成交量爆发股</div>
+                                <div class="condition-desc">最新成交量是30天平均量的2倍以上，资金关注度高</div>
+                            </label>
+                        </div>
+
+                        <!-- 条件6: 均线金叉 -->
+                        <div class="condition-item">
+                            <input type="checkbox" id="cond6" name="conditions" value="ma_golden_cross"
+                                   th:checked="${selectedConditions != null && selectedConditions.contains('ma_golden_cross')}">
+                            <label for="cond6">
+                                <div class="condition-title">✨ 均线金叉股</div>
+                                <div class="condition-desc">5日均线上穿10日均线，技术面看涨信号</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="search-button">🔍 开始筛选</button>
+                </form>
+
+                <script>
+                    function updateParamsVisibility() {
+                        const cond1 = document.getElementById('cond1');
+                        const params = document.getElementById('cond1-params');
+                        params.style.display = cond1.checked ? 'block' : 'none';
+                    }
+                    // 页面加载时初始化
+                    document.addEventListener('DOMContentLoaded', updateParamsVisibility);
+                </script>
+            </div>
+
+            <!-- 结果展示区域 -->
+            <div class="results-section" th:if="${results != null || message != null}">
+                <!-- 提示消息 -->
+                <div class="message" th:if="${message != null}" th:text="${message}"></div>
+
+                <!-- 筛选结果 -->
+                <div th:if="${results != null && !results.isEmpty()}">
+                    <div class="results-header">
+                        <div class="results-title">筛选结果</div>
+                        <div class="results-count" th:text="'共找到 ' + ${resultCount} + ' 只股票'"></div>
+                    </div>
+
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>股票代码</th>
+                                <th>股票名称</th>
+                                <th>当前价格</th>
+                                <th>历史最高</th>
+                                <th>跌幅/位置</th>
+                                <th>匹配条件</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="stock : ${results}">
+                                <td class="stock-symbol" th:text="${stock.symbol}">sh600000</td>
+                                <td th:text="${stock.name}">示例股票</td>
+                                <td class="price" th:text="${stock.currentPrice != null ? '¥' + #numbers.formatDecimal(stock.currentPrice, 1, 2) : '--'}">¥10.50</td>
+                                <td th:text="${stock.historicalHigh != null ? '¥' + #numbers.formatDecimal(stock.historicalHigh, 1, 2) : '--'}">¥15.20</td>
+                                <td>
+                                    <span th:if="${stock.dropPercentage != null}" 
+                                          th:text="'-' + ${#numbers.formatDecimal(stock.dropPercentage, 1, 2)} + '%'"
+                                          th:class="${stock.dropPercentage > 30 ? 'drop-percentage drop-high' : (stock.dropPercentage > 15 ? 'drop-percentage drop-medium' : 'drop-percentage drop-low')}">
+                                        -25.5%
+                                    </span>
+                                    <span th:if="${stock.dropPercentage == null}">--</span>
+                                </td>
+                                <td>
+                                    <span class="condition-badge" th:text="${stock.matchedCondition}">超跌潜力股</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 无结果提示 -->
+                <div class="message" th:if="${results != null && results.isEmpty()}">
+                    未找到符合所选条件的股票，请尝试其他筛选条件
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

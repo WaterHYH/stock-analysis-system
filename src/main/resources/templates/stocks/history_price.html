@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>股票历史价格数据</title>
+    <style>
+        /* 分页容器固定定位样式 */
+        .pagination {
+            /* 固定定位在视口底部 */
+            position: fixed;
+            /* 距离底部20px */
+            bottom: 20px;
+            /* 水平居中定位 */
+            left: 50%;
+            /* X轴反向平移50%实现居中 */
+            transform: translateX(-50%);
+            /* 白色背景 */
+            background: white;
+            /* 内边距15px */
+            padding: 15px;
+            /* 8px圆角边框 */
+            border-radius: 8px;
+            /* 添加阴影效果 */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            /* 确保分页在最顶层 */
+            z-index: 1000;
+
+            /* 新增单行滚动布局 */
+            /* 启用flex布局 */
+            display: flex;
+            /* 禁止换行 */
+            flex-wrap: nowrap;
+            /* 横向溢出显示滚动条 */
+            overflow-x: auto;
+            /* 按钮间距8px */
+            gap: 8px;
+            /* 限制最大宽度为视口宽度-40px */
+            max-width: calc(100vw - 40px);
+        }
+
+        /* 分页链接样式优化 */
+        .pagination a {
+            /* 行内flex布局 */
+            display: inline-flex;
+            /* 垂直居中 */
+            align-items: center;
+            /* 水平居中 */
+            justify-content: center;
+            /* 内边距8px上下，16px左右 */
+            padding: 8px 16px;
+            /* 外边距0上下，4px左右 */
+            margin: 0 4px;
+            /* 1px灰色边框 */
+            border: 1px solid #ddd;
+            /* 4px圆角 */
+            border-radius: 4px;
+            /* 移除下划线 */
+            text-decoration: none;
+            /* 深灰色文字 */
+            color: #333;
+            /* 防止内容压缩 */
+            flex-shrink: 0;
+            /* 最小宽度36px */
+            min-width: 36px;
+            /* 添加过渡动画 */
+            transition: all 0.2s;
+        }
+
+        /* 当前页样式 */
+        .pagination a.current {
+            /* 蓝色背景 */
+            background-color: #007bff;
+            /* 白色文字 */
+            color: white;
+            /* 边框颜色与背景一致 */
+            border-color: #007bff;
+        }
+
+        /* 滚动条样式优化 */
+        /* WebKit浏览器滚动条整体样式 */
+        .pagination::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        /* 滚动条轨道样式 */
+        .pagination::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        /* 滚动条滑块样式 */
+        .pagination::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            /* 移动端按钮缩小 */
+            .pagination a {
+                min-width: 32px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* 表格容器：控制横向滚动 */
+        .table-container {
+            overflow-x: auto; /* 启用横向滚动 */
+            -webkit-overflow-scrolling: touch; /* 移动端滚动优化 */
+            width: 100%;
+            margin-bottom: 120px; /* 为分页栏预留空间 */
+        }
+
+        /* 表格样式 */
+        .stock-table {
+            width: max-content; /* 让表格宽度由内容决定 */
+            min-width: 100%; /* 至少撑满容器 */
+            table-layout: auto; /* 列宽根据内容自适应 */
+            border-collapse: collapse;
+        }
+
+        /* 单元格样式 */
+        .stock-table td, .stock-table th {
+            white-space: nowrap; /* 禁止换行 */
+            text-overflow: clip; /* 禁用省略号 */
+            padding: 8px 16px; /* 合理间距 */
+            border: 1px solid #ddd;
+        }
+
+        /* 可选：给表头添加固定背景 */
+        .stock-table thead th {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 股票搜索表单 -->
+<h1>股票历史价格数据</h1>
+<form th:action="@{/stock-history}" method="get">
+    <input type="text" name="symbol" placeholder="输入股票代码" th:value="${symbol}">
+    <button type="submit">搜索</button>
+</form>
+
+<!-- 股票历史数据表格容器 -->
+<div class="table-container">
+<table class="stock-table">
+    <thead>
+    <tr>
+        <!-- 基础信息 -->
+        <th>代码</th>
+        <th>日期</th>
+
+        <!-- 价格信息 -->
+        <th>开盘价</th>
+        <th>最高价</th>
+        <th>最低价</th>
+        <th>收盘价</th>
+
+        <!-- 成交量 -->
+        <th>成交量</th>
+
+        <!-- 均值信息 -->
+        <th>5日均价</th>
+        <th>10日均价</th>
+        <th>30日均价</th>
+        <th>5日均量</th>
+        <th>10日均量</th>
+        <th>30日均量</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 遍历显示股票历史数据 -->
+    <tr th:each="history : ${historyData.content}">
+        <td th:text="${history.symbol}">sh600000</td>
+        <td th:text="${#temporals.format(history.day, 'yyyy-MM-dd')}">2023-08-10</td>
+        
+        <!-- 价格信息 -->
+        <td th:text="${#numbers.formatDecimal(history.open, 1, 2)}">10.87</td>
+        <td th:text="${#numbers.formatDecimal(history.high, 1, 2)}">10.90</td>
+        <td th:text="${#numbers.formatDecimal(history.low, 1, 2)}">10.85</td>
+        <td th:text="${#numbers.formatDecimal(history.close, 1, 2)}">10.88</td>
+        
+        <!-- 成交量 -->
+        <td th:text="${#numbers.formatInteger(history.volume, 0, 'COMMA')}">58,387,902</td>
+        
+        <!-- 均值信息 -->
+        <td th:text="${history.maPrice5 != 0} ? ${#numbers.formatDecimal(history.maPrice5, 1, 2)} : '--'">10.82</td>
+        <td th:text="${history.maPrice10 != 0} ? ${#numbers.formatDecimal(history.maPrice10, 1, 2)} : '--'">10.78</td>
+        <td th:text="${history.maPrice30 != 0} ? ${#numbers.formatDecimal(history.maPrice30, 1, 2)} : '--'">10.72</td>
+        <td th:text="${history.maVolume5 != 0} ? ${#numbers.formatInteger(history.maVolume5, 0, 'COMMA')} : '--'">60,123,456</td>
+        <td th:text="${history.maVolume10 != 0} ? ${#numbers.formatInteger(history.maVolume10, 0, 'COMMA')} : '--'">59,876,543</td>
+        <td th:text="${history.maVolume30 != 0} ? ${#numbers.formatInteger(history.maVolume30, 0, 'COMMA')} : '--'">58,987,654</td>
+    </tr>
+    </tbody>
+</table>
+</div>
+
+<!-- 分页导航 -->
+<div class="pagination" th:if="${historyData.totalPages > 1}">
+    <span th:if="${!historyData.first}">
+        <a th:href="@{/stock-history(page=0, size=${historyData.size}, symbol=${symbol})}">首页</a>
+    </span>
+    <span th:if="${!historyData.first}">
+        <a th:href="@{/stock-history(page=${historyData.number - 1}, size=${historyData.size}, symbol=${symbol})}">上页</a>
+    </span>
+
+    <span th:each="i : ${#numbers.sequence(0, historyData.totalPages - 1)}">
+        <a th:href="@{/stock-history(page=${i}, size=${historyData.size}, symbol=${symbol})}"
+           th:text="${i + 1}"
+           th:classappend="${i == historyData.number} ? 'current'"></a>
+    </span>
+
+    <span th:if="${!historyData.last}">
+        <a th:href="@{/stock-history(page=${historyData.number + 1}, size=${historyData.size}, symbol=${symbol})}">下页</a>
+    </span>
+    <span th:if="${!historyData.last}">
+        <a th:href="@{/stock-history(page=${historyData.totalPages - 1}, size=${historyData.size}, symbol=${symbol})}">末页</a>
+    </span>
+</div>
+
+</body>
+</html>
