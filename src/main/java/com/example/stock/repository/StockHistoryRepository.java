@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,23 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
             ON DUPLICATE KEY UPDATE id = id
             """)
     int insertStockHistory(@Param("entity") StockHistory stockHistory);
+
+    /**
+     * 按股票代码模糊查询 + 分页（无总数统计）
+     * @param symbol 股票代码
+     * @param pageable 分页参数
+     * @return 股票历史实体分页结果
+     */
+    @Query("SELECT sh FROM StockHistory sh WHERE sh.symbol LIKE %:symbol% ORDER BY sh.day DESC")
+    Page<StockHistory> findBySymbolContainingWithoutCount(@Param("symbol") String symbol, Pageable pageable);
+
+    /**
+     * 查询所有历史数据 + 分页（无总数统计）
+     * @param pageable 分页参数
+     * @return 股票历史实体分页结果
+     */
+    @Query("SELECT sh FROM StockHistory sh ORDER BY sh.day DESC")
+    Page<StockHistory> findAllWithoutCount(Pageable pageable);
 
     /**
      * 按股票代码模糊查询 + 分页
@@ -159,6 +177,7 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
      * 索引2: symbol + high (用于聚合查询最高价)
      */
     @Modifying
+    @Transactional
     @Query(value = """
         CREATE INDEX IF NOT EXISTS idx_symbol_date ON stock_history(symbol, trade_date DESC);
         CREATE INDEX IF NOT EXISTS idx_symbol_high ON stock_history(symbol, high DESC);
