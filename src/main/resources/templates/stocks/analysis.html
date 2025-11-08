@@ -382,6 +382,21 @@
                                 <div class="condition-desc">5日均线上穿10日均线，技术面看涨信号</div>
                             </label>
                         </div>
+                        
+                        <!-- 条件6的参数配置 -->
+                        <div class="condition-item" id="cond6-params" style="grid-column: span 2; display: none;">
+                            <label style="padding: 0;">
+                                <div class="condition-title" style="margin-bottom: 15px;">⚙️ 参数设置</div>
+                                <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                                    <div>
+                                        <label style="display: block; font-size: 13px; color: #666; margin-bottom: 5px;">交易日期</label>
+                                        <input type="date" name="goldenCrossDate" th:value="${goldenCrossDate}" 
+                                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                        <div style="font-size: 12px; color: #999; margin-top: 3px;">默认：当前日期</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
                     </div>
 
                     <button type="submit" class="search-button">🔍 开始筛选</button>
@@ -390,8 +405,11 @@
                 <script>
                     function updateParamsVisibility() {
                         const cond1 = document.getElementById('cond1');
-                        const params = document.getElementById('cond1-params');
-                        params.style.display = cond1.checked ? 'block' : 'none';
+                        const cond1Params = document.getElementById('cond1-params');
+                        const cond6 = document.getElementById('cond6');
+                        const cond6Params = document.getElementById('cond6-params');
+                        cond1Params.style.display = cond1.checked ? 'block' : 'none';
+                        cond6Params.style.display = cond6.checked ? 'block' : 'none';
                     }
                     // 页面加载时初始化
                     document.addEventListener('DOMContentLoaded', updateParamsVisibility);

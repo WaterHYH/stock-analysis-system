@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -172,6 +173,16 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
     List<Map<String, Object>> findGoldenCrossStocksOptimized();
 
     /**
+     * 获取最近两个交易日的所有股票数据
+     * 优化方案：先获取最近两个交易日的数据，然后通过代码过滤出金叉股票
+     * @param latestDate 最新交易日
+     * @param previousDate 前一个交易日
+     * @return 股票历史数据列表
+     */
+    @Query("SELECT sh FROM StockHistory sh WHERE sh.day IN (:latestDate, :previousDate) ORDER BY sh.symbol, sh.day DESC")
+    List<StockHistory> findLatestTwoDaysData(@Param("latestDate") LocalDate latestDate, @Param("previousDate") LocalDate previousDate);
+
+    /**
      * 创建必要的索引以优化查询性能
      * 索引1: symbol + trade_date (用于按股票代码和日期排序)
      * 索引2: symbol + high (用于聚合查询最高价)
@@ -183,4 +194,18 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
         CREATE INDEX IF NOT EXISTS idx_symbol_high ON stock_history(symbol, high DESC);
         """, nativeQuery = true)
     void createIndexes();
+
+    /**
+     * 获取所有股票代码
+     * @return 股票代码列表
+     */
+    @Query("SELECT DISTINCT sh.symbol FROM StockHistory sh")
+    List<String> findAllSymbols();
+
+    /**
+     * 根据股票代码查询所有历史记录，按日期升序排列
+     * @param symbol 股票代码
+     * @return 股票历史数据列表
+     */
+    List<StockHistory> findBySymbolOrderByDayAsc(String symbol);
 }
