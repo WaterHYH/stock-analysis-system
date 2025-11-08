@@ -432,7 +432,6 @@
                         <thead>
                             <tr>
                                 <th>股票代码</th>
-                                <th>股票名称</th>
                                 <th>当前价格</th>
                                 <th>历史最高</th>
                                 <th>跌幅/位置</th>
@@ -442,7 +441,6 @@
                         <tbody>
                             <tr th:each="stock : ${results}">
                                 <td class="stock-symbol" th:text="${stock.symbol}">sh600000</td>
-                                <td th:text="${stock.name}">示例股票</td>
                                 <td class="price" th:text="${stock.currentPrice != null ? '¥' + #numbers.formatDecimal(stock.currentPrice, 1, 2) : '--'}">¥10.50</td>
                                 <td th:text="${stock.historicalHigh != null ? '¥' + #numbers.formatDecimal(stock.historicalHigh, 1, 2) : '--'}">¥15.20</td>
                                 <td>

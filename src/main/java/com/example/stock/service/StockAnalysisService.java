@@ -169,25 +169,12 @@ public class StockAnalysisService {
             long queryTime = System.currentTimeMillis() - queryStart;
             logger.info("数据库查询完成，找到{}条符合条件的记录，耗时{}ms", queryResults.size(), queryTime);
 
-            // 批量获取股票名称，不使用N+1查询
-            long buildStart = System.currentTimeMillis();
-            List<String> symbols = queryResults.stream()
-                    .map(row -> (String) row.get("symbol"))
-                    .collect(Collectors.toList());
-
-            long stockQueryStart = System.currentTimeMillis();
-            Map<String, String> stockNameMap = stockRepository.findBySymbolIn(symbols).stream()
-                    .collect(Collectors.toMap(Stock::getSymbol, Stock::getName));
-            long stockQueryTime = System.currentTimeMillis() - stockQueryStart;
-            logger.info("批量查询{}个股票名称，耗时{}ms", symbols.size(), stockQueryTime);
-
             List<StockAnalysisDTO> results = queryResults.stream().map(row -> {
                 String symbol = (String) row.get("symbol");
                 Double maxHigh = row.get("max_high") != null ? ((Number) row.get("max_high")).doubleValue() : 0.0;
                 Double currentPrice = row.get("current_price") != null ? ((Number) row.get("current_price")).doubleValue() : 0.0;
 
                 double dropPercentageResult = ((maxHigh - currentPrice) / maxHigh) * 100;
-                String name = stockNameMap.getOrDefault(symbol, "未知");
 
                 return StockAnalysisDTO.builder()
                         .symbol(symbol)
@@ -198,10 +185,9 @@ public class StockAnalysisService {
                         .build();
             }).collect(Collectors.toList());
 
-            long buildTime = System.currentTimeMillis() - buildStart;
             long totalTime = System.currentTimeMillis() - startTime;
-            logger.info("找到 {} 只符合条件的股票，总耗时{}ms（数据库查询{}ms + 构建对象{}ms）",
-                    results.size(), totalTime, queryTime, buildTime);
+            logger.info("找到 {} 只符合条件的股票，总耗时{}ms（数据库查询{}ms）",
+                    results.size(), totalTime, queryTime);
             return results;
         } catch (Exception e) {
             logger.error("数据库查询失败，使用应用层事后查询: {}", e.getMessage());
@@ -220,10 +206,6 @@ public class StockAnalysisService {
         // 获取所有股票代码并分批处理
         // 优化：不使用全表扫描，而是通过查询获取所有股票代码
         List<String> allStocks = stockHistoryRepository.findAllSymbols();
-
-        // 批量获取所有股票名称
-        Map<String, String> stockNameMap = stockRepository.findBySymbolIn(allStocks).stream()
-                .collect(Collectors.toMap(Stock::getSymbol, Stock::getName));
 
         for (int i = 0; i < allStocks.size(); i += batchSize) {
             int end = Math.min(i + batchSize, allStocks.size());
@@ -285,10 +267,9 @@ public class StockAnalysisService {
         List<StockAnalysisDTO> results = new ArrayList<>();
         LocalDate halfYearAgo = LocalDate.now().minusMonths(6);
 
-        // 获取所有股票代码并批量获取名称
+        // 获取所有股票代码
         // 优化：不使用全表扫描，而是通过查询获取所有股票代码
         List<String> allSymbols = stockHistoryRepository.findAllSymbols();
-        Map<String, String> stockNameMap = getStockNameMapBatch(allSymbols);
 
         for (String symbol : allSymbols) {
             List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
@@ -351,10 +332,9 @@ public class StockAnalysisService {
         logger.info("开始筛选连续上涨趋势股票");
         List<StockAnalysisDTO> results = new ArrayList<>();
 
-        // 获取所有股票代码并批量获取名称
+        // 获取所有股票代码
         // 优化：不使用全表扫描，而是通过查询获取所有股票代码
         List<String> allSymbols = stockHistoryRepository.findAllSymbols();
-        Map<String, String> stockNameMap = getStockNameMapBatch(allSymbols);
 
         for (String symbol : allSymbols) {
             List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
@@ -396,10 +376,9 @@ public class StockAnalysisService {
         List<StockAnalysisDTO> results = new ArrayList<>();
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
 
-        // 获取所有股票代码并批量获取名称
+        // 获取所有股票代码
         // 优化：不使用全表扫描，而是通过查询获取所有股票代码
         List<String> allSymbols = stockHistoryRepository.findAllSymbols();
-        Map<String, String> stockNameMap = getStockNameMapBatch(allSymbols);
 
         for (String symbol : allSymbols) {
             List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
@@ -449,10 +428,9 @@ public class StockAnalysisService {
         logger.info("开始筛选成交量激增股票");
         List<StockAnalysisDTO> results = new ArrayList<>();
 
-        // 获取所有股票代码并批量获取名称
+        // 获取所有股票代码
         // 优化：不使用全表扫描，而是通过查询获取所有股票代码
         List<String> allSymbols = stockHistoryRepository.findAllSymbols();
-        Map<String, String> stockNameMap = getStockNameMapBatch(allSymbols);
 
         for (String symbol : allSymbols) {
             List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
@@ -655,14 +633,6 @@ public class StockAnalysisService {
 
         logger.info("回退方案完成，找到 {} 只符合条件的股票", results.size());
         return results;
-    }
-
-    /**
-     * 批量获取股票名称
-     */
-    private Map<String, String> getStockNameMapBatch(List<String> symbols) {
-        return stockRepository.findBySymbolIn(symbols).stream()
-                .collect(Collectors.toMap(Stock::getSymbol, Stock::getName));
     }
 
     /**

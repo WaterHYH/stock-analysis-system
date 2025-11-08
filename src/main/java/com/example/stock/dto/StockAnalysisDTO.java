@@ -22,11 +22,6 @@ public class StockAnalysisDTO {
     private String symbol;
     
     /**
-     * 股票名称（从实时数据表获取）
-     */
-    private String name;
-    
-    /**
      * 当前价格
      */
     private Double currentPrice;
