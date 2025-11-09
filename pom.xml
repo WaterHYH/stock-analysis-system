@@ -124,4 +124,23 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>performance-test</id>
+			<properties>
+				<mainClass>com.example.stock.PerformanceTest</mainClass>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<mainClass>com.example.stock.PerformanceTest</mainClass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
