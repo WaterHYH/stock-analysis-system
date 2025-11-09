@@ -66,7 +66,6 @@ class GoldenCrossPerformanceTest {
             StockAnalysisDTO first = results.get(0);
             System.out.println("📋 首个金叉股票:");
             System.out.println("   股票代码: " + first.getSymbol());
-            System.out.println("   股票名称: " + first.getName());
             System.out.println("   当前价格: " + first.getCurrentPrice());
             System.out.println("   匹配条件: " + first.getMatchedCondition());
         }
