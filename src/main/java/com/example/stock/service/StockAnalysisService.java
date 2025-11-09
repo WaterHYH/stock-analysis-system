@@ -543,78 +543,67 @@ public class StockAnalysisService {
     
     /**
      * 条件6: 均线金叉（5日均线上穿10日均线）
-     * 优化方案：先获取最近两个交易日的数据，然后通过代码过滤出金叉股票
+     * 优化方案：使用IN查询获取最近两个交易日的数据
      * @param latestDate 用户指定的最新交易日
      */
     private List<StockAnalysisDTO> findGoldenCrossStocksWithDateInternal(LocalDate latestDate) {
-        long startTime = System.currentTimeMillis();
-        logger.info("开始筛选均线金叉股票（优化方案），最新日期: {}", latestDate);
-        List<StockAnalysisDTO> results = new ArrayList<>();
-
-        try {
-            // 根据用户输入的latestDate获取previousDate（前一个交易日）
-            LocalDate previousDate = latestDate.minusDays(1); // 简化处理，实际应根据交易日历调整
-            logger.info("使用用户输入日期: {} 和前一个交易日: {}", latestDate, previousDate);
-
-            // 获取最近两个交易日的所有股票数据
-            long dataQueryStart = System.currentTimeMillis();
-            List<StockHistory> latestTwoDaysData = stockHistoryRepository.findLatestTwoDaysData(latestDate, previousDate);
-            long dataQueryTime = System.currentTimeMillis() - dataQueryStart;
-            logger.info("获取最近两个交易日数据完成，共{}条记录，耗时{}ms", latestTwoDaysData.size(), dataQueryTime);
-
-            // 按股票代码分组
-            long groupStart = System.currentTimeMillis();
-            Map<String, List<StockHistory>> groupedBySymbol = latestTwoDaysData.stream()
-                    .collect(Collectors.groupingBy(StockHistory::getSymbol));
-            long groupTime = System.currentTimeMillis() - groupStart;
-            logger.info("数据分组完成，共{}只股票，耗时{}ms", groupedBySymbol.size(), groupTime);
-
-            // 分析金叉
-            long analysisStart = System.currentTimeMillis();
-            int goldenCrossCount = 0;
-            for (Map.Entry<String, List<StockHistory>> entry : groupedBySymbol.entrySet()) {
-                String symbol = entry.getKey();
-                List<StockHistory> histories = entry.getValue();
-
-                // 确保有两天的数据
-                if (histories.size() < 2) continue;
-
-                // 按日期排序，最新的在前
-                histories.sort(Comparator.comparing(StockHistory::getDay).reversed());
-                StockHistory today = histories.get(0);
-                StockHistory yesterday = histories.get(1);
-
-                // 确保是同一只股票的连续两天数据
-                if (!today.getDay().equals(latestDate) || !yesterday.getDay().equals(previousDate)) {
-                    continue;
-                }
-
-                // 判断金叉：昨天5日均线<=10日均线，今天5日均线>10日均线
-                // 同时确保均线数据不为null且大于0
-                if (yesterday.getMaPrice5() > 0 && yesterday.getMaPrice10() > 0 && 
-                    today.getMaPrice5() > 0 && today.getMaPrice10() > 0 &&
-                    yesterday.getMaPrice5() <= yesterday.getMaPrice10() && 
-                    today.getMaPrice5() > today.getMaPrice10()) {
-                    
-                    results.add(StockAnalysisDTO.builder()
-                            .symbol(symbol)
-                            .currentPrice(today.getClose())
-                            .matchedCondition("均线金叉（5日均线上穿10日均线）")
-                            .build());
-                    
-                    goldenCrossCount++;
-                }
-            }
-            long analysisTime = System.currentTimeMillis() - analysisStart;
-            long totalTime = System.currentTimeMillis() - startTime;
-            logger.info("金叉分析完成，找到 {} 只符合条件的股票，总耗时{}ms（数据查询{}ms + 分组{}ms + 分析{}ms）", 
-                    goldenCrossCount, totalTime, dataQueryTime, groupTime, analysisTime);
-            return results;
-        } catch (Exception e) {
-            logger.error("优化方案执行失败: {}", e.getMessage(), e);
-            logger.info("使用原有数据库查询方案");
-            return findGoldenCrossStocksOriginal();
+        // 查询前一个交易日
+        LocalDate previousDate = stockHistoryRepository.findPreviousTradeDate(latestDate);
+        if (previousDate == null) {
+            logger.warn("找不到{}之前的交易日期", latestDate);
+            return Collections.emptyList();
         }
+        
+        long startTime = System.currentTimeMillis();
+        logger.info("开始筛选均线金叉股票，最新日期: {}, 前一交易日: {}", latestDate, previousDate);
+        
+        // 获取最近两个交易日的所有股票数据
+        long queryStart = System.currentTimeMillis();
+        List<StockHistory> latestTwoDaysData = stockHistoryRepository.findLatestTwoDaysData(latestDate, previousDate);
+        long queryTime = System.currentTimeMillis() - queryStart;
+        logger.info("获取最近两个交易日数据完成，共{}条记录，耗时{}ms", latestTwoDaysData.size(), queryTime);
+
+        // 按股票代码分组
+        Map<String, List<StockHistory>> groupedBySymbol = latestTwoDaysData.stream()
+                .collect(Collectors.groupingBy(StockHistory::getSymbol));
+
+        // 分析金叉
+        List<StockAnalysisDTO> results = new ArrayList<>();
+        for (Map.Entry<String, List<StockHistory>> entry : groupedBySymbol.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
+
+            // 确保有两天的数据
+            if (histories.size() < 2) continue;
+
+            // 按日期排序，最新的在前
+            histories.sort(Comparator.comparing(StockHistory::getDay).reversed());
+            StockHistory today = histories.get(0);
+            StockHistory yesterday = histories.get(1);
+
+            // 验证数据日期
+            if (!today.getDay().equals(latestDate)) {
+                continue; // 最新数据不是指定日期，跳过
+            }
+
+            // 判断金叉：昨天5日均线<=10日均线，今天5日均线>10日均线
+            // 同时确保均线数据不为null且大于0
+            if (yesterday.getMaPrice5() > 0 && yesterday.getMaPrice10() > 0 && 
+                today.getMaPrice5() > 0 && today.getMaPrice10() > 0 &&
+                yesterday.getMaPrice5() <= yesterday.getMaPrice10() && 
+                today.getMaPrice5() > today.getMaPrice10()) {
+                
+                results.add(StockAnalysisDTO.builder()
+                        .symbol(symbol)
+                        .currentPrice(today.getClose())
+                        .matchedCondition("均线金叉（5日均线上穿10日均线）")
+                        .build());
+            }
+        }
+        
+        long totalTime = System.currentTimeMillis() - startTime;
+        logger.info("金叉分析完成，找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
+        return results;
     }
 
     /**
