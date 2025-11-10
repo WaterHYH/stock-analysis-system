@@ -116,11 +116,13 @@ public class SinaStockClient {
     /**
      * 获取单只股票历史数据（日线）
      * @param symbol 股票代码（如sh600000）
-     * @param code 股票数字代码（如600000）
      * @return 股票历史数据列表
      */
     // 获取单只股票历史数据（日线）
-    public List<StockHistoryDTO> getStockHistory(String symbol, String code) {
+    public List<StockHistoryDTO> getStockHistory(String symbol) {
+        // 从symbol中提取code（去除前缀）
+        String code = symbol.substring(2);
+        
         String endDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
         // 构造历史数据API请求URL，包含以下参数：
         // symbol: 股票代码（如sh600000、sz000001）

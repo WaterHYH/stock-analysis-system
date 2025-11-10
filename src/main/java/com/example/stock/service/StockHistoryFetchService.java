@@ -111,7 +111,7 @@ public class StockHistoryFetchService {
         String symbol = generateSymbol(code);
         if (symbol != null) {
             long startTime = System.currentTimeMillis();
-            fetchAndSaveHistory(symbol, symbol.substring(2));
+            fetchAndSaveHistory(symbol);
             long duration = System.currentTimeMillis() - startTime;
             
             // 如果本次调用耗时少于1秒，则补足延时到1秒
@@ -132,25 +132,24 @@ public class StockHistoryFetchService {
     /**
      * 获取并保存单个股票的历史数据
      * @param symbol 股票Symbol（例如 "sh600000"）
-     * @param code 股票Code（例如 "600000"）
      */
-    public void fetchAndSaveHistory(String symbol, String code) {
-        if (!StringUtils.hasText(symbol) || !StringUtils.hasText(code)) {
-            logger.error("Symbol或Code不能为空");
+    public void fetchAndSaveHistory(String symbol) {
+        if (!StringUtils.hasText(symbol)) {
+            logger.error("Symbol不能为空");
             return;
         }
 
-        logger.info("开始获取股票历史数据: symbol={}, code={}", symbol, code);
+        logger.info("开始获取股票历史数据: symbol={}", symbol);
         long totalStartTime = System.currentTimeMillis();
         
         // 1. 获取数据阶段
         long fetchStartTime = System.currentTimeMillis();
-        List<StockHistoryDTO> historyList = stockClient.getStockHistory(symbol, code);
+        List<StockHistoryDTO> historyList = stockClient.getStockHistory(symbol);
         long fetchDuration = System.currentTimeMillis() - fetchStartTime;
-        logger.info("⏱️ 获取数据耗时: {}ms, symbol={}, code={}", fetchDuration, symbol, code);
+        logger.info("⏱️ 获取数据耗时: {}ms, symbol={}", fetchDuration, symbol);
 
         if (historyList == null || historyList.isEmpty()) {
-            logger.info("未获取到股票历史数据: symbol={}, code={}", symbol, code);
+            logger.info("未获取到股票历史数据: symbol={}", symbol);
             return;
         }
 
@@ -167,8 +166,8 @@ public class StockHistoryFetchService {
         logger.info("⏱️ 批量插入耗时: {}ms, 记录数={}", insertDuration, result.length);
 
         long totalDuration = System.currentTimeMillis() - totalStartTime;
-        logger.info("✅ 成功保存股票历史数据: symbol={}, code={}, count={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 插入:{}ms)", 
-                symbol, code, result.length, totalDuration, fetchDuration, mapDuration, insertDuration);
+        logger.info("✅ 成功保存股票历史数据: symbol={}, count={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 插入:{}ms)", 
+                symbol, result.length, totalDuration, fetchDuration, mapDuration, insertDuration);
     }
 
     /**
