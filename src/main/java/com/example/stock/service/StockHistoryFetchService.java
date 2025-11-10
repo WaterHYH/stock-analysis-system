@@ -104,17 +104,27 @@ public class StockHistoryFetchService {
     /**
      * 处理单个股票代码
      * 生成股票symbol并获取保存其历史数据
+     * 根据实际API调用耗时智能延时：如果调用耗时≥1秒，则无需额外延时；否则补足到1秒
      * @param code 股票代码
      */
     private void processStock(int code) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
+            long startTime = System.currentTimeMillis();
             fetchAndSaveHistory(symbol, symbol.substring(2));
-            try {
-                Thread.sleep(1000); // 延时1秒，避免触发API限制
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("历史数据获取被中断", e);
+            long duration = System.currentTimeMillis() - startTime;
+            
+            // 如果本次调用耗时少于1秒，则补足延时到1秒
+            long remainingDelay = 1000 - duration;
+            if (remainingDelay > 0) {
+                try {
+                    Thread.sleep(remainingDelay);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("历史数据获取被中断", e);
+                }
+            } else {
+                logger.info("⚡ 本次调用耗时{}ms≥1秒，跳过额外延时", duration);
             }
         }
     }
