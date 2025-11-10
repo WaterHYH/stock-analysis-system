@@ -1,6 +1,7 @@
 package com.example.stock.service;
 
 import com.example.stock.dto.StockHistoryDTO;
+import com.example.stock.dto.StockDTO;
 import com.example.stock.entity.StockHistory;
 import com.example.stock.repository.StockHistoryRepository;
 import com.example.stock.service.client.SinaStockClient;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,64 +29,156 @@ public class StockHistoryFetchService {
 
     /**
      * 批量获取所有A股股票历史数据
-     * 覆盖沪市（A股）、深市、北交所的所有股票代码
-     * 
-     * 沪市（A股）:
-     *   - 600-605: 主板 (600000-605999)
-     *   - 607: 新增股票 (607000-607999)
-     *   - 608: 新增股票 (608000-608999)
-     *   - 609: 新增股票 (609000-609999)
-     *   - 688: 科创板 (688000-688999)
-     * 
-     * 深市:
-     *   - 000-003: 主板 (000000-003999)
-     *   - 100-103: 中小板 (100000-103999)
-     *   - 300: 创业板 (300000-300999)
-     *   - 004-009: 创业板 (004000-009999)
-     * 
-     * 北交所:
-     *   - 83, 87, 88, 89: 北交所股票 (830000-899999)
+     * 优化方案：优先从新浪财经API获取实际股票列表，然后获取历史数据
      */
     public void fetchAllStockHistory() {
         logger.info("开始批量获取所有A股股票历史数据...");
         
+        try {
+            // 尝试从新浪财经API获取实际股票列表
+            List<String> actualSymbols = getActualStockSymbolsFromAPI();
+            
+            if (!actualSymbols.isEmpty()) {
+                logger.info("从新浪财经API中获取到{}只股票，开始获取历史数据...", actualSymbols.size());
+                // 使用实际股票列表获取历史数据
+                processStockList(actualSymbols);
+                return;
+            }
+        } catch (Exception e) {
+            logger.warn("从新浪财经API获取股票列表失败，使用传统遍历方式: {}", e.getMessage());
+        }
+        
+        // 如果API获取失败，则使用传统遍历方式
+        logger.info("使用传统遍历方式获取股票历史数据...");
+        fetchAllStockHistoryByTraversal();
+        
+        logger.info("✅ 所有A股股票历史数据获取完成");
+    }
+
+    /**
+     * 处理股票列表
+     * @param symbols 股票符号列表
+     */
+    private void processStockList(List<String> symbols) {
+        int successCount = 0;
+        int failureCount = 0;
+        int batchSize = 50; // 每批处理50只股票
+        
+        // 分批处理股票列表
+        for (int i = 0; i < symbols.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, symbols.size());
+            List<String> batch = symbols.subList(i, end);
+            
+            logger.info("开始处理第{}-{}只股票...", i + 1, end);
+            
+            for (String symbol : batch) {
+                try {
+                    processStockWithValidationBySymbol(symbol);
+                    successCount++;
+                } catch (Exception e) {
+                    logger.warn("处理股票{}时发生错误: {}", symbol, e.getMessage());
+                    failureCount++;
+                }
+            }
+            
+            logger.info("批次处理完成: 当前成功{}只，失败{}只", successCount, failureCount);
+            
+            // 每批之间添加延时，避免请求过于频繁
+            if (end < symbols.size()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("批量处理被中断", e);
+                }
+            }
+        }
+        
+        logger.info("处理完成: 成功{}只，失败{}只", successCount, failureCount);
+    }
+
+    /**
+     * 从新浪财经API获取实际存在的股票列表
+     * @return 股票符号列表
+     */
+    private List<String> getActualStockSymbolsFromAPI() {
+        List<String> symbols = new ArrayList<>();
+        
+        try {
+            // 获取所有A股数据
+            int page = 1;
+            int pageSize = 100; // 每页获取100只股票
+            StockDTO[] stocks;
+            
+            do {
+                stocks = stockClient.fetchStocksByPage(page, pageSize);
+                if (stocks != null && stocks.length > 0) {
+                    for (StockDTO stock : stocks) {
+                        if (stock.getSymbol() != null) {
+                            symbols.add(stock.getSymbol());
+                        }
+                    }
+                    logger.info("已获取第{}页股票数据，当前总计{}只股票", page, symbols.size());
+                    page++;
+                    // 添加延时避免请求过于频繁
+                    Thread.sleep(50);
+                }
+            } while (stocks != null && stocks.length > 0);
+            
+        } catch (InterruptedException e) {
+            logger.error("获取股票列表被中断: {}", e.getMessage());
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error("获取股票列表失败: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+        
+        logger.info("总共获取到{}只股票", symbols.size());
+        return symbols;
+    }
+
+    /**
+     * 使用完整遍历方式获取所有A股股票历史数据
+     */
+    private void fetchAllStockHistoryByTraversal() {
         // 沪市主板 (600-605)
         logger.info("正在获取沪市主板股票数据 (600-605)...");
         for (int code = 600000; code <= 605999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         
         // 沪市新增号段 (607-609)
         logger.info("正在获取沪市新增号段股票数据 (607-609)...");
         for (int code = 607000; code <= 609999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         
         // 沪市科创板 (688)
         logger.info("正在获取沪市科创板股票数据 (688)...");
         for (int code = 688000; code <= 688999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         
         // 深市主板 (000-003)
         logger.info("正在获取深市主板股票数据 (000-003)...");
         for (int code = 0; code <= 3999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         
         // 深市中小板 (100-103)
         logger.info("正在获取深市中小板股票数据 (100-103)...");
         for (int code = 100000; code <= 103999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         
         // 深市创业板 (300, 004-009)
         logger.info("正在获取深市创业板股票数据 (300, 004-009)...");
         for (int code = 300000; code <= 399999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         for (int code = 4000; code <= 99999; code++) {
-            processStock(code);
+            processStockWithValidation(code);
         }
         
         // 北交所 (83, 87, 88, 89)
@@ -94,37 +188,76 @@ public class StockHistoryFetchService {
             int start = prefix * 10000;
             int end = start + 9999;
             for (int code = start; code <= end; code++) {
-                processStock(code);
+                processStockWithValidation(code);
             }
         }
-        
-        logger.info("✅ 所有A股股票历史数据获取完成");
     }
 
     /**
-     * 处理单个股票代码
+     * 处理单个股票代码（带验证）
      * 生成股票symbol并获取保存其历史数据
+     * 如果获取数据失败，则跳过该股票
      * 根据实际API调用耗时智能延时：如果调用耗时≥1秒，则无需额外延时；否则补足到1秒
      * @param code 股票代码
      */
-    private void processStock(int code) {
+    private void processStockWithValidation(int code) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
+            processStockWithValidationBySymbol(symbol);
+        }
+    }
+
+    /**
+     * 处理单个股票符号（带验证和重试机制）
+     * 获取保存其历史数据
+     * 如果获取数据失败，则跳过该股票
+     * 根据实际API调用耗时智能延时：如果调用耗时≥1秒，则无需额外延时；否则补足到1秒
+     * @param symbol 股票符号
+     */
+    private void processStockWithValidationBySymbol(String symbol) {
+        int maxRetries = 3; // 最大重试次数
+        int retryCount = 0;
+        
+        while (retryCount <= maxRetries) {
             long startTime = System.currentTimeMillis();
-            fetchAndSaveHistory(symbol);
-            long duration = System.currentTimeMillis() - startTime;
-            
-            // 如果本次调用耗时少于1秒，则补足延时到1秒
-            long remainingDelay = 1000 - duration;
-            if (remainingDelay > 0) {
-                try {
-                    Thread.sleep(remainingDelay);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("历史数据获取被中断", e);
+            try {
+                fetchAndSaveHistory(symbol);
+                long duration = System.currentTimeMillis() - startTime;
+                
+                // 如果本次调用耗时少于1秒，则补足延时到1秒
+                long remainingDelay = 1000 - duration;
+                if (remainingDelay > 0) {
+                    try {
+                        Thread.sleep(remainingDelay);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("历史数据获取被中断", e);
+                    }
+                } else {
+                    logger.info("⚡ 本次调用耗时{}ms≥1秒，跳过额外延时", duration);
                 }
-            } else {
-                logger.info("⚡ 本次调用耗时{}ms≥1秒，跳过额外延时", duration);
+                return; // 成功处理后直接返回
+            } catch (Exception e) {
+                retryCount++;
+                if (retryCount <= maxRetries) {
+                    logger.warn("获取股票{}历史数据失败，第{}次重试: {}", symbol, retryCount, e.getMessage());
+                    // 重试前添加延时
+                    try {
+                        Thread.sleep(1000 * retryCount); // 递增延时
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("历史数据获取被中断", ie);
+                    }
+                } else {
+                    logger.warn("获取股票{}历史数据失败，已达到最大重试次数: {}", symbol, e.getMessage());
+                    // 即使获取失败，也要适当延时避免频繁请求
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("历史数据获取被中断", ie);
+                    }
+                }
             }
         }
     }
