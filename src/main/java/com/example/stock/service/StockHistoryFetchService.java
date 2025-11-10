@@ -26,27 +26,79 @@ public class StockHistoryFetchService {
     private final StockMapper stockMapper;
 
     /**
-     * 批量获取所有股票历史数据
-     * 遍历沪市和深市的所有股票代码，获取其历史数据
+     * 批量获取所有A股股票历史数据
+     * 覆盖沪市（A股）、深市、北交所的所有股票代码
+     * 
+     * 沪市（A股）:
+     *   - 600-605: 主板 (600000-605999)
+     *   - 607: 新增股票 (607000-607999)
+     *   - 608: 新增股票 (608000-608999)
+     *   - 609: 新增股票 (609000-609999)
+     *   - 688: 科创板 (688000-688999)
+     * 
+     * 深市:
+     *   - 000-003: 主板 (000000-003999)
+     *   - 100-103: 中小板 (100000-103999)
+     *   - 300: 创业板 (300000-300999)
+     *   - 004-009: 创业板 (004000-009999)
+     * 
+     * 北交所:
+     *   - 83, 87, 88, 89: 北交所股票 (830000-899999)
      */
     public void fetchAllStockHistory() {
-        // 遍历沪市主板（60开头）
-        for (int code = 600000; code <= 609999; code++) {
+        logger.info("开始批量获取所有A股股票历史数据...");
+        
+        // 沪市主板 (600-605)
+        logger.info("正在获取沪市主板股票数据 (600-605)...");
+        for (int code = 600000; code <= 605999; code++) {
             processStock(code);
         }
-        // 遍历科创板（688开头）
+        
+        // 沪市新增号段 (607-609)
+        logger.info("正在获取沪市新增号段股票数据 (607-609)...");
+        for (int code = 607000; code <= 609999; code++) {
+            processStock(code);
+        }
+        
+        // 沪市科创板 (688)
+        logger.info("正在获取沪市科创板股票数据 (688)...");
         for (int code = 688000; code <= 688999; code++) {
             processStock(code);
         }
-        // 遍历深市主板、中小板、创业板
-        int[] szPrefixes = {0, 1, 2, 300};
-        for (int prefix : szPrefixes) {
-            int start = prefix * 1000;
-            int end = start + 999;
+        
+        // 深市主板 (000-003)
+        logger.info("正在获取深市主板股票数据 (000-003)...");
+        for (int code = 0; code <= 3999; code++) {
+            processStock(code);
+        }
+        
+        // 深市中小板 (100-103)
+        logger.info("正在获取深市中小板股票数据 (100-103)...");
+        for (int code = 100000; code <= 103999; code++) {
+            processStock(code);
+        }
+        
+        // 深市创业板 (300, 004-009)
+        logger.info("正在获取深市创业板股票数据 (300, 004-009)...");
+        for (int code = 300000; code <= 399999; code++) {
+            processStock(code);
+        }
+        for (int code = 4000; code <= 99999; code++) {
+            processStock(code);
+        }
+        
+        // 北交所 (83, 87, 88, 89)
+        logger.info("正在获取北交所股票数据 (83, 87, 88, 89)...");
+        int[] bjPrefixes = {83, 87, 88, 89};
+        for (int prefix : bjPrefixes) {
+            int start = prefix * 10000;
+            int end = start + 9999;
             for (int code = start; code <= end; code++) {
                 processStock(code);
             }
         }
+        
+        logger.info("✅ 所有A股股票历史数据获取完成");
     }
 
     /**
@@ -111,17 +163,38 @@ public class StockHistoryFetchService {
 
     /**
      * 根据股票代码生成股票symbol
+     * 沪京交易所 (sh): 60xxxx, 607xxx, 608xxx, 609xxx, 688xxx
+     * 深圳交易所 (sz): 000xxx-099xxx, 100xxx-103xxx, 300xxx
+     * 北京交易所 (bj): 83xxxx, 87xxxx, 88xxxx, 89xxxx
      * @param code 股票代码
-     * @return 股票symbol（如sh600000或sz000001）
+     * @return 股票symbol（如sh600000或sz000001或bj830000）
      */
     private String generateSymbol(int code) {
         String paddedCode = String.format("%06d", code);
+        String twoDigitPrefix = paddedCode.substring(0, 2);
+        int prefixValue = Integer.parseInt(twoDigitPrefix);
+        
+        // 沪京交易所 (A股) - 60开头、607-609、688
         if (paddedCode.startsWith("60") || paddedCode.startsWith("688")) {
             return "sh" + paddedCode;
-        } else if (paddedCode.startsWith("000") || paddedCode.startsWith("001")
-                || paddedCode.startsWith("002") || paddedCode.startsWith("300")) {
+        }
+        // 沪市新增号段 (607-609)
+        else if (prefixValue >= 607 && prefixValue <= 609) {
+            return "sh" + paddedCode;
+        }
+        // 深圳交易所 (A股) - 北交所号段外的数字
+        // 000-099 (主板、中小板、创业板混合)
+        // 100-103 (中小板)
+        // 300-309+ (创业板)
+        else if (prefixValue <= 103 || prefixValue == 300) {
             return "sz" + paddedCode;
-        } else {
+        }
+        // 北京交易所 (A股) - 83, 87, 88, 89
+        else if (prefixValue == 83 || prefixValue == 87 
+                 || prefixValue == 88 || prefixValue == 89) {
+            return "bj" + paddedCode;
+        } 
+        else {
             return null;
         }
     }
