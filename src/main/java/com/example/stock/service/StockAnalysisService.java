@@ -551,8 +551,16 @@ public class StockAnalysisService {
             String symbol = entry.getKey();
             List<StockHistory> histories = entry.getValue();
 
-            // 确保有两天的数据
-            if (histories.size() < 2) continue;
+            // 处理停牌情况：如果只有当天数据而没有前一天数据，单独获取这个股票的上一个交易日数据
+            if (histories.size() < 2) {
+                // 查询该股票的上一个交易日数据
+                StockHistory previousDayData = stockHistoryRepository.findPreviousDayDataForStock(symbol, latestDate);
+                if (previousDayData != null) {
+                    histories.add(previousDayData);
+                } else {
+                    continue; // 仍然没有足够数据，跳过
+                }
+            }
 
             // 按日期排序，最新的在前
             histories.sort(Comparator.comparing(StockHistory::getDay).reversed());

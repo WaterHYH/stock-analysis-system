@@ -195,6 +195,15 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
     LocalDate findPreviousTradeDate(@Param("currentDate") LocalDate currentDate);
 
     /**
+     * 查询指定股票在指定日期之前的最近一条交易数据
+     * @param symbol 股票代码
+     * @param currentDate 当前日期
+     * @return 前一个交易日的股票数据，如果不存在则返回null
+     */
+    @Query("SELECT sh FROM StockHistory sh WHERE sh.symbol = :symbol AND sh.day < :currentDate ORDER BY sh.day DESC LIMIT 1")
+    StockHistory findPreviousDayDataForStock(@Param("symbol") String symbol, @Param("currentDate") LocalDate currentDate);
+
+    /**
      * 创建必要的索引以优化查询性能
      * 索引1: symbol + trade_date (用于按股票代码和日期排序)
      * 索引2: symbol + high (用于聚合查询最高价)
