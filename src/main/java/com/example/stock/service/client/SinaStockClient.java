@@ -69,41 +69,12 @@ public class SinaStockClient {
     }
 
     /**
-     * 分页获取股票数据（自定义页面大小）
-     * @param page 页码
-     * @param pageSize 页面大小
-     * @return 包含股票代码、名称、交易所的DTO集合
-     */
-    public StockDTO[] fetchStocksByPage(int page, int pageSize) {
-        String url = buildFullUrl(page, pageSize);
-        return restTemplate.getForObject(url, StockDTO[].class);
-    }
-
-    /**
      * 构建完整的URL
      * @param page 页码
      * @return 完整的URL字符串
      */
     private String buildFullUrl(int page) {
         Map<String, String> params = buildParams(page);
-        StringBuilder urlBuilder = new StringBuilder(API_BASE_URL);
-        urlBuilder.append('?');
-        params.forEach((key, value) -> urlBuilder.append(key).append('=').append(value).append('&'));
-        // 删除最后一个多余的'&'
-        if (urlBuilder.charAt(urlBuilder.length() - 1) == '&') {
-            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
-        }
-        return urlBuilder.toString();
-    }
-
-    /**
-     * 构建完整的URL（自定义页面大小）
-     * @param page 页码
-     * @param pageSize 页面大小
-     * @return 完整的URL字符串
-     */
-    private String buildFullUrl(int page, int pageSize) {
-        Map<String, String> params = buildParams(page, pageSize);
         StringBuilder urlBuilder = new StringBuilder(API_BASE_URL);
         urlBuilder.append('?');
         params.forEach((key, value) -> urlBuilder.append(key).append('=').append(value).append('&'));
@@ -132,19 +103,9 @@ public class SinaStockClient {
      * @return 包含分页、排序等参数的Map
      */
     private Map<String, String> buildParams(int page) {
-        return buildParams(page, 100); // 默认页面大小为100
-    }
-
-    /**
-     * 构建接口请求参数（自定义页面大小）
-     * @param page 当前页码
-     * @param pageSize 页面大小
-     * @return 包含分页、排序等参数的Map
-     */
-    private Map<String, String> buildParams(int page, int pageSize) {
         Map<String, String> params = new HashMap<>();
         params.put("page", String.valueOf(page));
-        params.put("num", String.valueOf(pageSize)); // 控制每页数据量‌:ml-citation{ref="4,5" data="citationList"}
+        params.put("num", "100");        // 控制每页数据量‌:ml-citation{ref="4,5" data="citationList"}
         params.put("node", "hs_a");      // 固定参数：沪深A股‌:ml-citation{ref="4,5" data="citationList"}
         params.put("sort", "code");    // 按代码排序
         params.put("asc", "1");          // 升序排列
