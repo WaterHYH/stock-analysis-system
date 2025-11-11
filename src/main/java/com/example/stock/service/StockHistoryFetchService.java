@@ -24,6 +24,7 @@ public class StockHistoryFetchService {
     private final SinaStockClient stockClient;
     private final StockHistoryRepository stockHistoryRepository;
     private final StockMapper stockMapper;
+    private final KLineAnalysisService kLineAnalysisService;
 
     /**
      * 批量获取所有A股股票历史数据

@@ -229,4 +229,11 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
      * @return 股票历史数据列表
      */
     List<StockHistory> findBySymbolOrderByDayAsc(String symbol);
+    
+    /**
+     * 根据股票代码查询所有历史记录，按日期降序排列
+     * @param symbol 股票代码
+     * @return 股票历史数据列表
+     */
+    List<StockHistory> findBySymbolOrderByDayDesc(String symbol);
 }
