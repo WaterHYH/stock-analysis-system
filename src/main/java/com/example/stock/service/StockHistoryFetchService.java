@@ -161,8 +161,10 @@ public class StockHistoryFetchService {
         logger.info("⏱️ 数据转换耗时: {}ms, 记录数={}", mapDuration, entities.size());
 
         // 2.5 数据排序阶段：按日期降序排列（最新到最旧），确保K线分析能正确获取前一天数据
+        long sortStartTime = System.currentTimeMillis();
         entities.sort((a, b) -> b.getDay().compareTo(a.getDay()));
-        logger.info("⏱️ 数据排序完成，按日期降序排列");
+        long sortDuration = System.currentTimeMillis() - sortStartTime;
+        logger.info("⏱️ 数据排序完成，按日期降序排列，耗时: {}ms", sortDuration);
 
         // 3. K线分析阶段
         long analysisStartTime = System.currentTimeMillis();
