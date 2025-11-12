@@ -37,7 +37,7 @@ class KLineAnalysisIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
-    private static final String TEST_SYMBOL = "sh600000_test";
+    private static final String TEST_SYMBOL = "sh600000";
     
     @BeforeEach
     void setUp() {
@@ -56,76 +56,68 @@ class KLineAnalysisIntegrationTest {
      */
     private void cleanTestData() {
         try {
-            jdbcTemplate.execute("DELETE FROM stock_history WHERE symbol LIKE '%_test'");
+            // 删除测试symbol的数据
+            jdbcTemplate.execute("DELETE FROM stock_history WHERE symbol = 'sh600000' AND trade_date >= '2024-01-01'");
         } catch (Exception e) {
             // 表可能不存在或已清理
         }
     }
     
     @Test
-    @DisplayName("测试1: 完整流程 - 模拟获取数据→分析→保存")
+    @DisplayName("测试1: 真实API数据获取→K线分析→持久化完整流程")
     void testKLineAnalysisFieldsPersistence() {
-        // 模拟真实的历史数据列表 (从API获取)
-        List<StockHistory> historyList = new java.util.ArrayList<>();
+        // 使用真实的API获取数据并保存（模拟StockHistorySyncScheduler的真实运行）
+        stockHistoryFetchService.fetchAndSaveHistory(TEST_SYMBOL);
         
-        // 创建5条历史数据 (最新到最旧)
-        for (int i = 0; i < 5; i++) {
-            StockHistory history = new StockHistory();
-            history.setSymbol(TEST_SYMBOL);
-            history.setCode("600000");
-            history.setDay(LocalDate.now().minusDays(i));
-            history.setOpen(10.0 + i * 0.1);
-            history.setClose(10.5 + i * 0.1); // 逐日上涨
-            history.setHigh(11.0 + i * 0.1);
-            history.setLow(10.0 + i * 0.1);
-            history.setVolume(1000000 + i * 100000);
-            history.setMaPrice5(10.3 + i * 0.05);
-            history.setMaPrice10(10.2 + i * 0.05);
-            history.setMaPrice30(10.1 + i * 0.05);
-            history.setMaVolume5(1000000);
-            history.setMaVolume10(1000000);
-            history.setMaVolume30(1000000);
-            historyList.add(history);
-        }
-        
-        // 模拟完整流程：遍历分析每条数据（就像StockHistoryFetchService.fetchAndSaveHistory()中的逻辑）
-        for (int i = 0; i < historyList.size(); i++) {
-            StockHistory current = historyList.get(i);
-            StockHistory previous = (i + 1 < historyList.size()) ? historyList.get(i + 1) : null;
-            // 这里调用K线分析，就像实际代码中做的那样
-            kLineAnalysisService.analyzeKLine(current, previous, historyList.subList(i, historyList.size()));
-        }
-        
-        // 批量保存到数据库
-        stockHistoryRepository.saveAll(historyList);
-        
-        // 从数据库读取
+        // 从数据库读取刚保存的数据
         List<StockHistory> result = stockHistoryRepository.findBySymbol(TEST_SYMBOL);
         
         // 验证数据已保存
         assertFalse(result.isEmpty(), "历史数据应被保存到数据库");
-        assertEquals(5, result.size(), "应保存5条记录");
+        System.out.println("✅ 从API获取并保存了 " + result.size() + " 条历史数据");
         
-        // 验证第一条记录（最新的）的K线分析字段是否已保存
+        // 找到最新的一条数据进行验证
         StockHistory newest = result.stream()
             .max((a, b) -> a.getDay().compareTo(b.getDay()))
             .orElse(null);
         
         assertNotNull(newest, "应能找到最新数据");
+        
+        // 验证K线分析字段是否已保存（这是关键！）
+        System.out.println("\n验证K线分析字段是否被保存：");
+        System.out.println("  - 交易日期: " + newest.getDay());
+        System.out.println("  - K线类型: " + newest.getKlineType() + " (0:阴线, 1:阳线, 2:十字星)");
+        System.out.println("  - 涨跌幅: " + newest.getChangePercent() + "%");
+        System.out.println("  - 振幅: " + newest.getAmplitude() + "%");
+        System.out.println("  - 量比: " + newest.getVolumeRatio());
+        System.out.println("  - MA5金叉: " + newest.getIsMa5GoldenCross());
+        System.out.println("  - 均线多头: " + newest.getIsMaBullish());
+        System.out.println("  - 是否放量: " + newest.getIsVolumeSurge());
+        System.out.println("  - MACD DIF: " + newest.getMacdDif());
+        System.out.println("  - RSI6: " + newest.getRsi6());
+        
+        // 断言：K线分析字段必须不为null（除非当天是第一天数据）
         assertNotNull(newest.getKlineType(), "K线类型应被保存");
         assertNotNull(newest.getChangePercent(), "涨跌幅应被保存");
         assertNotNull(newest.getAmplitude(), "振幅应被保存");
         assertNotNull(newest.getVolumeRatio(), "量比应被保存");
         
-        assertTrue(newest.getChangePercent() >= 0, "涨跌幅值应该有效");
-        assertTrue(newest.getAmplitude() >= 0, "振幅值应该有效");
-        assertTrue(newest.getVolumeRatio() > 0, "量比值应该有效");
+        // 验证至少有几条数据包含完整的技术指标（需要足够的历史数据才能计算）
+        long recordsWithMACD = result.stream()
+            .filter(h -> h.getMacdDif() != null)
+            .count();
+        long recordsWithRSI = result.stream()
+            .filter(h -> h.getRsi6() != null)
+            .count();
         
-        System.out.println("✅ K线分析字段已正确保存到数据库");
-        System.out.println("  - K线类型: " + newest.getKlineType());
-        System.out.println("  - 涨跌幅: " + newest.getChangePercent() + "%");
-        System.out.println("  - 振幅: " + newest.getAmplitude() + "%");
-        System.out.println("  - 量比: " + newest.getVolumeRatio());
+        System.out.println("\n技术指标计算覆盖率：");
+        System.out.println("  - 包含MACD的记录数: " + recordsWithMACD + " / " + result.size());
+        System.out.println("  - 包含RSI的记录数: " + recordsWithRSI + " / " + result.size());
+        
+        assertTrue(recordsWithMACD > 0, "应该有记录包含MACD指标");
+        assertTrue(recordsWithRSI > 0, "应该有记录包含RSI指标");
+        
+        System.out.println("\n✅ K线分析字段已正确保存到数据库！");
     }
     
     @Test
