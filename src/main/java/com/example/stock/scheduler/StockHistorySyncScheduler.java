@@ -25,7 +25,7 @@ public class StockHistorySyncScheduler {
      * 每天16:30执行的股票历史数据同步任务
      * 使用异步线程池执行，避免阻塞主线程
      */
-    @Scheduled(cron = "0 51 7 * * ?")
+    @Scheduled(cron = "0 20 7 * * ?")
     public void syncStockHistory() {
         syncTaskExecutor.execute(() -> {
             logger.info("开始同步股票历史数据，时间：{}", LocalDateTime.now());
