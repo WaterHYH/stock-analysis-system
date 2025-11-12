@@ -25,12 +25,12 @@ public class StockDataSyncScheduler {
      * 每天3:10执行的股票数据同步任务
      * 使用异步线程池执行，避免阻塞主线程
      */
-    @Scheduled(cron = "0 10 3 * * ?")
+    @Scheduled(cron = "0 39 7 * * ?")
     public void syncStockData() {
         syncTaskExecutor.execute(() -> {
             logger.info("开始同步股票实时数据，时间：{}", LocalDateTime.now());
-            int count = dataFetchService.fetchAndSaveStockData();
-            logger.info("股票实时数据同步完成，同步记录数：{}", count);
+            //int count = dataFetchService.fetchAndSaveStockData();
+            //logger.info("股票实时数据同步完成，同步记录数：{}", count);
         });
     }
 }

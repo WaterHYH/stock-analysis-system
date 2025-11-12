@@ -160,15 +160,30 @@ public class StockHistoryFetchService {
         long mapDuration = System.currentTimeMillis() - mapStartTime;
         logger.info("⏱️ 数据转换耗时: {}ms, 记录数={}", mapDuration, entities.size());
 
-        // 3. 批量插入阶段
+        // 2.5 数据排序阶段：按日期降序排列（最新到最旧），确保K线分析能正确获取前一天数据
+        entities.sort((a, b) -> b.getDay().compareTo(a.getDay()));
+        logger.info("⏱️ 数据排序完成，按日期降序排列");
+
+        // 3. K线分析阶段
+        long analysisStartTime = System.currentTimeMillis();
+        for (int i = 0; i < entities.size(); i++) {
+            StockHistory current = entities.get(i);
+            StockHistory previous = (i + 1 < entities.size()) ? entities.get(i + 1) : null;
+            // 会传入整个数据列表，思维是这个列表扢滅宅最旧的数据。会找到应沾的指标值
+            kLineAnalysisService.analyzeKLine(current, previous, entities);
+        }
+        long analysisDuration = System.currentTimeMillis() - analysisStartTime;
+        logger.info("⏱️ K线分析耗时: {}ms, 记录数={}", analysisDuration, entities.size());
+
+        // 4. 批量插入阶段
         long insertStartTime = System.currentTimeMillis();
         int[] result = stockHistoryRepository.batchInsertStockHistory(entities);
         long insertDuration = System.currentTimeMillis() - insertStartTime;
         logger.info("⏱️ 批量插入耗时: {}ms, 记录数={}", insertDuration, result.length);
 
         long totalDuration = System.currentTimeMillis() - totalStartTime;
-        logger.info("✅ 成功保存股票历史数据: symbol={}, count={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 插入:{}ms)", 
-                symbol, result.length, totalDuration, fetchDuration, mapDuration, insertDuration);
+        logger.info("✅ 成功保存股票历史数据: symbol={}, count={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 分析:{}ms, 插入:{}ms)", 
+                symbol, result.length, totalDuration, fetchDuration, mapDuration, analysisDuration, insertDuration);
     }
 
     /**
