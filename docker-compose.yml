@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  stock-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock-system
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/stock_db?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: stock_user
+      SPRING_DATASOURCE_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - ./logs:/app/logs
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - stock-network
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  mysql:
+    image: mysql:8.0
+    container_name: stock-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_USER: stock_user
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: stock_db
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - stock-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+networks:
+  stock-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
