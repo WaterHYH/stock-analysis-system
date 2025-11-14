@@ -1,0 +1,12 @@
+2025-11-15 02:50:57.327 [main] INFO  com.example.stock.StockApplication - Starting StockApplication using Java 17.0.7 with PID 4044 (C:\workspace\IntelliJ-IDEA\stock-system\target\classes started by water in C:\workspace\IntelliJ-IDEA\stock-system)
+2025-11-15 02:50:57.330 [main] INFO  com.example.stock.StockApplication - No active profile set, falling back to 1 default profile: "default"
+2025-11-15 02:50:58.720 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2025-11-15 02:50:58.721 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-11-15 02:50:58.722 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-11-15 02:50:58.815 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-11-15 02:50:59.438 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-11-15 02:51:04.225 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6c519e47
+2025-11-15 02:51:04.227 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-11-15 02:51:06.763 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-15 02:51:07.059 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2025-11-15 02:51:07.081 [main] INFO  com.example.stock.StockApplication - Started StockApplication in 10.39 seconds (process running for 11.23)
