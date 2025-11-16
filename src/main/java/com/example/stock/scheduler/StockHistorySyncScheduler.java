@@ -22,15 +22,28 @@ public class StockHistorySyncScheduler {
     private final TaskExecutor syncTaskExecutor;
 
     /**
-     * 每天16:30执行的股票历史数据同步任务
+     * 项目启动时立即执行的股票历史数据同步任务
      * 使用异步线程池执行，避免阻塞主线程
      */
-    @Scheduled(cron = "0 14 1 * * ?")
-    public void syncStockHistory() {
+    @Scheduled(initialDelay = 1000, fixedDelay = Long.MAX_VALUE)
+    public void syncStockHistoryOnStartup() {
         syncTaskExecutor.execute(() -> {
-            logger.info("开始同步股票历史数据，时间：{}", LocalDateTime.now());
+            logger.info("项目启动时开始同步股票历史数据，时间：{}", LocalDateTime.now());
             historyFetchService.fetchAllStockHistory();
-            logger.info("股票历史数据同步完成");
+            logger.info("项目启动时股票历史数据同步完成");
+        });
+    }
+
+    /**
+     * 每天16:00执行的股票历史数据同步任务
+     * 使用异步线程池执行，避免阻塞主线程
+     */
+    @Scheduled(cron = "0 0 16 * * ?")
+    public void syncStockHistoryDaily() {
+        syncTaskExecutor.execute(() -> {
+            logger.info("开始每日定时同步股票历史数据，时间：{}", LocalDateTime.now());
+            historyFetchService.fetchAllStockHistory();
+            logger.info("每日股票历史数据同步完成");
         });
     }
 }

@@ -118,8 +118,18 @@ public class SinaStockClient {
      * @param symbol 股票代码（如sh600000）
      * @return 股票历史数据列表
      */
-    // 获取单只股票历史数据（日线）
     public List<StockHistoryDTO> getStockHistory(String symbol) {
+        return getStockHistory(symbol, 70000);
+    }
+
+    /**
+     * 获取单只股票历史数据（日线），支持指定获取长度
+     * @param symbol 股票代码（如sh600000）
+     * @param datalen 获取end_date之前多少个单位（自然日）的历史数据，默认70000表示尽可能多
+     * @return 股票历史数据列表
+     */
+    // 获取单只股票历史数据（日线）
+    public List<StockHistoryDTO> getStockHistory(String symbol, int datalen) {
         // 从symbol中提取code（去除前缀）
         String code = symbol.substring(2);
         
@@ -127,10 +137,10 @@ public class SinaStockClient {
         // 构造历史数据API请求URL，包含以下参数：
         // symbol: 股票代码（如sh600000、sz000001）
         // scale: K线周期，240表示日线（其他可选值：5/15/30/60分钟）
-        // datalen: 数据长度，70000表示获取尽可能多的历史数据
+        // datalen: 数据长度，默认70000表示获取尽可能多的历史数据，可指定为较小值进行增量获取
         // end_date: 结束日期，格式为yyyyMMdd
-        String url = String.format("%s?symbol=%s&scale=240&datalen=70000&end_date=%s",
-                API_HISTORY_URL, symbol, endDate);
+        String url = String.format("%s?symbol=%s&scale=240&datalen=%d&end_date=%s",
+                API_HISTORY_URL, symbol, datalen, endDate);
 
         // 1. 获取原始 JSON 响应
         String jsonResponse = restTemplate.getForObject(url, String.class);

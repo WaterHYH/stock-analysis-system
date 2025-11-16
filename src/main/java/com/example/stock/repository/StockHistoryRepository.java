@@ -236,4 +236,17 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
      * @return 股票历史数据列表
      */
     List<StockHistory> findBySymbolOrderByDayDesc(String symbol);
+
+    /**
+     * 查询指定股票的最新交易日期
+     * 用于增量同步，避免重新获取已有的历史数据
+     * @param symbol 股票代码
+     * @return 最新交易日期，如果表中无数据则返回null
+     */
+    @Query(value = """
+        SELECT MAX(trade_date) 
+        FROM stock_history 
+        WHERE symbol = :symbol
+        """, nativeQuery = true)
+    LocalDate findLatestTradeDateBySymbol(@Param("symbol") String symbol);
 }

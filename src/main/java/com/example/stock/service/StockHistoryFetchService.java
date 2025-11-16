@@ -113,29 +113,15 @@ public class StockHistoryFetchService {
     private void processStock(int code) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
-            long startTime = System.currentTimeMillis();
-            boolean isFullSync = fetchAndSaveHistory(symbol);  // 获取是否为全量获取的标志
-            long duration = System.currentTimeMillis() - startTime;
-
-            // 对于全量获取，增加额外延迟以减轻磁盘I/O压力
-            long extraDelay = 0;
-            if (isFullSync) {
-                // 全量获取时增加2-5秒延迟，避免阿里云服务器磁盘I/O超出限制
-                extraDelay = 2000 + (long)(Math.random() * 3000);
-                logger.info("全量获取完成，为避免磁盘I/O超限将额外延迟{}ms", extraDelay);
-            }
-
-            // 计算总延迟时间
-            long totalDelay = extraDelay - duration;
-            if (totalDelay > 0) {
+            long duration = fetchAndSaveHistory(symbol);
+            if (duration > 1000) {
+                logger.info("执行耗时{}ms，总延迟{}ms", duration, duration*2);
                 try {
-                    Thread.sleep(totalDelay);
+                    Thread.sleep(duration*2);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("历史数据获取被中断", e);
                 }
-            } else {
-                logger.info("⚡ 本次调用耗时{}ms≥{}ms，跳过额外延时", duration, extraDelay);
             }
         }
     }
@@ -143,14 +129,13 @@ public class StockHistoryFetchService {
     /**
      * 获取并保存单个股票的历史数据
      * 优化：第一次获取全部数据，然后基于数据库最新记录日期实现增量同步
-     * 如果数据库最新记录就是当天，则跳过API调用
      * @param symbol 股票Symbol（例如 "sh600000"）
-     * @return 是否执行了全量获取（数据库中无数据时为true）
+     * @return 执行耗时（毫秒），不执行任何操作时返回0
      */
-    public boolean fetchAndSaveHistory(String symbol) {
+    public long fetchAndSaveHistory(String symbol) {
         if (!StringUtils.hasText(symbol)) {
             logger.error("Symbol不能为空");
-            return false;
+            return 0;
         }
 
         logger.info("开始获取股票历史数据: symbol={}", symbol);
@@ -170,7 +155,7 @@ public class StockHistoryFetchService {
             // 只有当数据库最新记录就是最近的交易日时，才跳过API调用
             if (latestDbDate.equals(lastTradingDay)) {
                 logger.info("✅ 数据库中最新记录已是最近的交易日({})，无需调用API，直接跳过", latestDbDate);
-                return false;  // 既不是全量获取，也没有执行操作
+                return 0;
             }
         }
 
@@ -197,7 +182,7 @@ public class StockHistoryFetchService {
 
         if (historyList == null || historyList.isEmpty()) {
             logger.info("未获取到股票历史数据: symbol={}", symbol);
-            return false;  // 返回是否为全量获取
+            return System.currentTimeMillis() - totalStartTime;
         }
 
         // 3. 数据转换阶段
@@ -230,7 +215,7 @@ public class StockHistoryFetchService {
         // 如果没有新记录，不需要执行后续处理
         if (newRecords.isEmpty()) {
             logger.info("✅ symbol={}的数据已是最新，没有新记录需要写入", symbol);
-            return false;  // 返回是否为全量获取
+            return System.currentTimeMillis() - totalStartTime;
         }
 
         // 6. K线分析阶段（仅处理新记录）
@@ -259,7 +244,7 @@ public class StockHistoryFetchService {
         logger.info("✅ 成功保存股票历史数据: symbol={}, 新增数据数={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 过滤:{}ms, 分析:{}ms, 插入:{}ms)",
                 symbol, result.length, totalDuration, fetchDuration, mapDuration, filterDuration, analysisDuration, insertDuration);
 
-        return isFullSync;  // 返回是否为全量获取
+        return System.currentTimeMillis() - totalStartTime;  // 返回执行耗时
     }
 
     /**
