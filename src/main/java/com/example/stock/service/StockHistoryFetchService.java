@@ -2,7 +2,9 @@ package com.example.stock.service;
 
 import com.example.stock.dto.StockHistoryDTO;
 import com.example.stock.entity.StockHistory;
+import com.example.stock.entity.StockSyncLog;
 import com.example.stock.repository.StockHistoryRepository;
+import com.example.stock.repository.StockSyncLogRepository;
 import com.example.stock.service.client.SinaStockClient;
 import com.example.stock.service.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class StockHistoryFetchService {
     private static final Logger logger = LoggerFactory.getLogger(StockHistoryFetchService.class);
     private final SinaStockClient stockClient;
     private final StockHistoryRepository stockHistoryRepository;
+    private final StockSyncLogRepository stockSyncLogRepository;
     private final StockMapper stockMapper;
     private final KLineAnalysisService kLineAnalysisService;
 
@@ -106,23 +109,41 @@ public class StockHistoryFetchService {
     /**
      * 处理单个股票代码
      * 生成股票symbol并获取保存其历史数据
-     * 根据实际API调用耗时智能延时：如果调用耗时≥1秒，则无需额外延时；否则补足到1秒
-     * 对于全量获取的股票，增加额外延迟以避免磁盘I/O超出阿里云限制
+     * 如果当天已经获取过则跳过
      * @param code 股票代码
      */
     private void processStock(int code) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
+            // ... existing code ...
+            // 检查该股票今天是否已经同步过
+            if (stockSyncLogRepository.findBySymbolAndSyncDate(symbol, LocalDate.now()).isPresent()) {
+                logger.debug("今天已同步过此股票，跳过: symbol={}", symbol);
+                return;
+            }
+            
             int insertedCount = fetchAndSaveHistory(symbol);
-            // 只有实际插入了数据才需要延时（insertedCount > 0表示有新数据被插入）
+            // 只有实际插入了数据才需要延时
             if (insertedCount > 0) {
                 logger.info("成功插入{}条新记录，执行延时", insertedCount);
+                // 记录同步日志
+                StockSyncLog syncLog = new StockSyncLog();
+                syncLog.setSymbol(symbol);
+                syncLog.setSyncDate(LocalDate.now());
+                stockSyncLogRepository.save(syncLog);
+                
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("历史数据获取被中断", e);
                 }
+            } else {
+                // 即使没有新数据也要记录同步
+                StockSyncLog syncLog = new StockSyncLog();
+                syncLog.setSymbol(symbol);
+                syncLog.setSyncDate(LocalDate.now());
+                stockSyncLogRepository.save(syncLog);
             }
         }
     }
