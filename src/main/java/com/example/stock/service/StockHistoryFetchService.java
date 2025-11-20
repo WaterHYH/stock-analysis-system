@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 股票历史数据获取服务类
@@ -53,43 +55,50 @@ public class StockHistoryFetchService {
     public void fetchAllStockHistory() {
         logger.info("开始批量获取所有A股股票历史数据...");
 
+        // 一次性获取所有同步日志，避免重复查询数据库
+        List<StockSyncLog> syncLogs = stockSyncLogRepository.findAll();
+        Map<String, StockSyncLog> syncLogMap = new HashMap<>();
+        for (StockSyncLog log : syncLogs) {
+            syncLogMap.put(log.getSymbol(), log);
+        }
+
         // 沪市主板 (600-605)
         logger.info("正在获取沪市主板股票数据 (600-605)...");
         for (int code = 600000; code <= 605999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
 
         // 沪市新增号段 (607-609)
         logger.info("正在获取沪市新增号段股票数据 (607-609)...");
         for (int code = 607000; code <= 609999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
 
         // 沪市科创板 (688)
         logger.info("正在获取沪市科创板股票数据 (688)...");
         for (int code = 688000; code <= 688999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
 
         // 深市主板 (000-003)
         logger.info("正在获取深市主板股票数据 (000-003)...");
         for (int code = 0; code <= 3999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
 
         // 深市中小板 (100-103)
         logger.info("正在获取深市中小板股票数据 (100-103)...");
         for (int code = 100000; code <= 103999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
 
         // 深市创业板 (300, 004-009)
         logger.info("正在获取深市创业板股票数据 (300, 004-009)...");
         for (int code = 300000; code <= 399999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
         for (int code = 4000; code <= 99999; code++) {
-            processStock(code);
+            processStock(code, syncLogMap);
         }
 
         // 北交所 (83, 87, 88, 89)
@@ -99,7 +108,7 @@ public class StockHistoryFetchService {
             int start = prefix * 10000;
             int end = start + 9999;
             for (int code = start; code <= end; code++) {
-                processStock(code);
+                processStock(code, syncLogMap);
             }
         }
 
@@ -111,39 +120,47 @@ public class StockHistoryFetchService {
      * 生成股票symbol并获取保存其历史数据
      * 如果当天已经获取过则跳过
      * @param code 股票代码
+     * @param syncLogMap 同步日志 Map (symbol -> StockSyncLog)
      */
-    private void processStock(int code) {
+    private void processStock(int code, Map<String, StockSyncLog> syncLogMap) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
-            // ... existing code ...
-            // 检查该股票今天是否已经同步过
-            if (stockSyncLogRepository.findBySymbolAndSyncDate(symbol, LocalDate.now()).isPresent()) {
-                logger.debug("今天已同步过此股票，跳过: symbol={}", symbol);
-                return;
+            // 检查字典中是否存在该股票的同步记录
+            if (syncLogMap.containsKey(symbol)) {
+                StockSyncLog syncLog = syncLogMap.get(symbol);
+                if (syncLog.getSyncDate().equals(LocalDate.now())) {
+                    logger.debug("今天已同步过此股票，跳过: symbol={}", symbol);
+                    return;
+                }
             }
-            
+
             int insertedCount = fetchAndSaveHistory(symbol);
-            // 只有实际插入了数据才需要延时
-            if (insertedCount > 0) {
-                logger.info("成功插入{}条新记录，执行延时", insertedCount);
-                // 记录同步日志
+            // 对于同步日志的处理：
+            // 1. 字典中存在该股票 -> 更新sync_date
+            // 2. 字典中不存在 -> 创建新记录
+            if (syncLogMap.containsKey(symbol)) {
+                // 更新现有记录
+                StockSyncLog syncLog = syncLogMap.get(symbol);
+                syncLog.setSyncDate(LocalDate.now());
+                stockSyncLogRepository.save(syncLog);
+            } else {
+                // 创建新记录
                 StockSyncLog syncLog = new StockSyncLog();
                 syncLog.setSymbol(symbol);
                 syncLog.setSyncDate(LocalDate.now());
                 stockSyncLogRepository.save(syncLog);
-                
+                syncLogMap.put(symbol, syncLog);
+            }
+
+            // 只有实际插入了数据才需要延时
+            if (insertedCount > 0) {
+                logger.info("成功插入{}条新记录，执行延时", insertedCount);
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(insertedCount*2);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("历史数据获取被中断", e);
                 }
-            } else {
-                // 即使没有新数据也要记录同步
-                StockSyncLog syncLog = new StockSyncLog();
-                syncLog.setSymbol(symbol);
-                syncLog.setSyncDate(LocalDate.now());
-                stockSyncLogRepository.save(syncLog);
             }
         }
     }

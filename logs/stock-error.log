@@ -163,3 +163,10 @@ ERROR in ch.qos.logback.classic.PatternLayout("null") - Empty or null pattern.
 	at org.springframework.boot.logging.logback.LogbackLoggingSystem.initialize(LogbackLoggingSystem.java:197)
 	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:332)
 	... 19 common frames omitted
+2025-11-21 02:38:46.380 [stock-sync-1] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Communications link failure
+
+The last packet successfully received from the server was 754 milliseconds ago. The last packet sent successfully to the server was 1,777 milliseconds ago.
+2025-11-21 03:44:20.842 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600649, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600649&scale=240&datalen=70000&end_date=20251121, response=
+2025-11-21 04:44:47.889 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600764, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600764&scale=240&datalen=70000&end_date=20251121, response=
+2025-11-21 06:04:48.452 [stock-sync-1] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - HikariPool-1 - Connection is not available, request timed out after 20011ms (total=0, active=0, idle=0, waiting=0)
+2025-11-21 06:04:48.452 [stock-sync-1] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Server shutdown in progress
