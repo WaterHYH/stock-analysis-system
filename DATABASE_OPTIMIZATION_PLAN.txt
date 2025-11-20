@@ -1,0 +1,142 @@
+================================================================================
+股票历史数据表优化计划
+================================================================================
+
+【当前状态】
+- 表名: stock_history
+- 数据量: 2,847,103 条记录
+- 磁盘占用: 2809.33 MB (约2.8GB)
+- 表结构: 46个字段
+
+【优化目标】
+- 目标大小: 约800MB - 1GB (节省60-70%)
+- 保持所有字段和功能不变
+- 优化数据类型，使用更紧凑的存储
+
+================================================================================
+【优化策略】
+================================================================================
+
+1. 均量字段优化（已执行）
+   - maVolume5:  BIGINT(8字节) -> INT(4字节) ✓ 执行中
+   - maVolume10: BIGINT(8字节) -> INT(4字节) ✓ 执行中
+   - maVolume30: BIGINT(8字节) -> INT(4字节) ✓ 执行中
+   预计节省: 3字段 * (8-4) = 12字节/行 * 2.8M = 33.6 MB
+
+2. 整数字段优化（已执行）
+   - kline_type:          INT -> TINYINT ✓ 执行中
+   - consecutive_rise_days: INT -> SMALLINT ✓ 执行中
+   预计节省: 6字节/行 * 2.8M = 16.8 MB
+
+3. 价格字段优化（待执行）
+   - open, high, low, close:  DOUBLE(8字节) -> DECIMAL(8,3)(4-5字节)
+   - maPrice5, maPrice10, maPrice30: DOUBLE -> DECIMAL(8,3)
+   - 7个字段共计
+   预计节省: 7 * (8-5) = 21字节/行 * 2.8M = 58.8 MB
+
+4. 百分比字段优化（待执行）
+   - change_percent, amplitude, turnover_rate: DOUBLE -> DECIMAL(6,2)
+   - volume_ratio: DOUBLE -> DECIMAL(6,2)
+   - 4个字段共计
+   预计节省: 4 * (8-3) = 20字节/行 * 2.8M = 56 MB
+
+5. 技术指标字段优化（待执行）
+   - rsi6, rsi12, rsi24: DOUBLE -> DECIMAL(5,2)
+   - boll_upper, boll_middle, boll_lower: DOUBLE -> DECIMAL(8,3)
+   - macd_dif, macd_dea, macd_bar: DOUBLE -> DECIMAL(10,4)
+   - 9个字段共计
+   预计节省: 9 * (8-5) = 27字节/行 * 2.8M = 75.6 MB
+
+================================================================================
+【已执行命令】
+================================================================================
+
+命令1: 修改均量字段（约需10-20分钟）
+ALTER TABLE stock_history 
+  MODIFY COLUMN maVolume5 INT, 
+  MODIFY COLUMN maVolume10 INT, 
+  MODIFY COLUMN maVolume30 INT;
+
+命令2: 修改整数字段（约需5-10分钟）
+ALTER TABLE stock_history 
+  MODIFY COLUMN kline_type TINYINT, 
+  MODIFY COLUMN consecutive_rise_days SMALLINT;
+
+================================================================================
+【待执行命令】
+================================================================================
+
+命令3: 修改价格字段
+ALTER TABLE stock_history
+  MODIFY COLUMN open DECIMAL(8,3),
+  MODIFY COLUMN high DECIMAL(8,3),
+  MODIFY COLUMN low DECIMAL(8,3),
+  MODIFY COLUMN close DECIMAL(8,3),
+  MODIFY COLUMN maPrice5 DECIMAL(8,3),
+  MODIFY COLUMN maPrice10 DECIMAL(8,3),
+  MODIFY COLUMN maPrice30 DECIMAL(8,3);
+
+命令4: 修改百分比和成交量比例字段
+ALTER TABLE stock_history
+  MODIFY COLUMN change_percent DECIMAL(6,2),
+  MODIFY COLUMN amplitude DECIMAL(6,2),
+  MODIFY COLUMN turnover_rate DECIMAL(6,2),
+  MODIFY COLUMN volume_ratio DECIMAL(6,2);
+
+命令5: 修改技术指标字段
+ALTER TABLE stock_history
+  MODIFY COLUMN rsi6 DECIMAL(5,2),
+  MODIFY COLUMN rsi12 DECIMAL(5,2),
+  MODIFY COLUMN rsi24 DECIMAL(5,2),
+  MODIFY COLUMN boll_upper DECIMAL(8,3),
+  MODIFY COLUMN boll_middle DECIMAL(8,3),
+  MODIFY COLUMN boll_lower DECIMAL(8,3),
+  MODIFY COLUMN macd_dif DECIMAL(10,4),
+  MODIFY COLUMN macd_dea DECIMAL(10,4),
+  MODIFY COLUMN macd_bar DECIMAL(10,4);
+
+命令6: 优化表，回收空间（最后执行）
+OPTIMIZE TABLE stock_history;
+
+================================================================================
+【预期效果对比】
+================================================================================
+
+原始状态:
+- 磁盘占用: 2809.33 MB
+- 每行大小: 约1000字节
+
+优化后预期:
+- 磁盘占用: 约800-1000 MB
+- 每行大小: 约350-400字节
+- 节省空间: 约60-70%
+- 改进: 还能保留所有字段，只是使用更紧凑的数据类型
+
+================================================================================
+【执行建议】
+================================================================================
+
+1. 每个ALTER TABLE命令会锁表，建议在业务低谷期执行（晚上）
+2. 每个命令执行时间: 5-20分钟（取决于数据库负载）
+3. 完整优化预计耗时: 1-2小时
+4. 执行后需运行OPTIMIZE TABLE回收空间
+5. 可以定期检查表大小变化
+
+检查表大小命令:
+SELECT 
+    table_name,
+    ROUND(((data_length + index_length) / 1024 / 1024), 2) AS 'Size (MB)',
+    table_rows AS 'Rows'
+FROM information_schema.tables 
+WHERE table_schema = 'stock_db' AND table_name = 'stock_history';
+
+================================================================================
+【回滚方案】
+================================================================================
+
+如果修改后出现问题，可以从备份恢复（如果之前做了备份）:
+RESTORE TABLE stock_history FROM BACKUP;
+
+或者通过git重新初始化数据库（需要重新同步所有历史数据）
+
+================================================================================

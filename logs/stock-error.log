@@ -1,2 +1,69 @@
-2025-11-16 16:00:19.889 [stock-sync-2] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - HikariPool-1 - Connection is not available, request timed out after 20069ms (total=4, active=0, idle=4, waiting=0)
-2025-11-16 16:00:19.889 [stock-sync-2] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - No operations allowed after connection closed.
+2025-11-21 00:13:55.425 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 无法获得股票历史数据, symbol=sh600086, 最后尝试错误: I/O error on GET request for "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData": Request timed out
+org.springframework.web.client.ResourceAccessException: I/O error on GET request for "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData": Request timed out
+	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:925)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:905)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:800)
+	at org.springframework.web.client.RestTemplate.getForObject(RestTemplate.java:414)
+	at com.example.stock.service.client.SinaStockClient.getStockHistory(SinaStockClient.java:150)
+	at com.example.stock.service.StockHistoryFetchService.fetchAndSaveHistory(StockHistoryFetchService.java:180)
+	at com.example.stock.service.StockHistoryFetchService.processStock(StockHistoryFetchService.java:116)
+	at com.example.stock.service.StockHistoryFetchService.fetchAllStockHistory(StockHistoryFetchService.java:56)
+	at com.example.stock.scheduler.StockHistorySyncScheduler.lambda$0(StockHistorySyncScheduler.java:32)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: java.net.http.HttpTimeoutException: Request timed out
+	at org.springframework.http.client.JdkClientHttpRequest.executeInternal(JdkClientHttpRequest.java:124)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:71)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:117)
+	at com.example.stock.config.RestTemplateConfig.lambda$restTemplate$2(RestTemplateConfig.java:51)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
+	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:899)
+	... 10 common frames omitted
+2025-11-21 00:14:44.550 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 无法获得股票历史数据, symbol=sh600087, 最后尝试错误: I/O error on GET request for "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData": Request timed out
+org.springframework.web.client.ResourceAccessException: I/O error on GET request for "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData": Request timed out
+	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:925)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:905)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:800)
+	at org.springframework.web.client.RestTemplate.getForObject(RestTemplate.java:414)
+	at com.example.stock.service.client.SinaStockClient.getStockHistory(SinaStockClient.java:150)
+	at com.example.stock.service.StockHistoryFetchService.fetchAndSaveHistory(StockHistoryFetchService.java:180)
+	at com.example.stock.service.StockHistoryFetchService.processStock(StockHistoryFetchService.java:116)
+	at com.example.stock.service.StockHistoryFetchService.fetchAllStockHistory(StockHistoryFetchService.java:56)
+	at com.example.stock.scheduler.StockHistorySyncScheduler.lambda$0(StockHistorySyncScheduler.java:32)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: java.net.http.HttpTimeoutException: Request timed out
+	at org.springframework.http.client.JdkClientHttpRequest.executeInternal(JdkClientHttpRequest.java:124)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:71)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:117)
+	at com.example.stock.config.RestTemplateConfig.lambda$restTemplate$2(RestTemplateConfig.java:51)
+	at org.springframework.http.client.InterceptingClientHttpRequest$InterceptingRequestExecution.execute(InterceptingClientHttpRequest.java:88)
+	at org.springframework.http.client.InterceptingClientHttpRequest.executeInternal(InterceptingClientHttpRequest.java:72)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:81)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:899)
+	... 10 common frames omitted
+2025-11-21 00:36:30.540 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600145, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600145&scale=240&datalen=1330&end_date=20251121, response=
+2025-11-21 00:36:46.768 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600146, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600146&scale=240&datalen=1267&end_date=20251121, response=
+2025-11-21 00:38:17.292 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600175, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600175&scale=240&datalen=1952&end_date=20251121, response=
+2025-11-21 00:41:19.978 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600240, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600240&scale=240&datalen=2149&end_date=20251121, response=
+2025-11-21 00:41:36.979 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600241, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600241&scale=240&datalen=21&end_date=20251121, response=
+2025-11-21 00:41:53.109 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600242, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600242&scale=240&datalen=905&end_date=20251121, response=
+2025-11-21 00:42:09.243 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600243, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600243&scale=240&datalen=21&end_date=20251121, response=
+2025-11-21 00:42:25.358 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600244, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600244&scale=240&datalen=70000&end_date=20251121, response=
+2025-11-21 00:42:57.959 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600247, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600247&scale=240&datalen=1751&end_date=20251121, response=
+2025-11-21 00:43:14.080 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600248, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600248&scale=240&datalen=21&end_date=20251121, response=
+2025-11-21 00:43:38.335 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600253, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600253&scale=240&datalen=4571&end_date=20251121, response=
+2025-11-21 00:53:51.383 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600311, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600311&scale=240&datalen=1015&end_date=20251121, response=
+2025-11-21 00:54:59.857 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600317, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600317&scale=240&datalen=1792&end_date=20251121, response=
+2025-11-21 01:06:58.400 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600385, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600385&scale=240&datalen=1260&end_date=20251121, response=
+2025-11-21 01:09:50.858 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600401, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600401&scale=240&datalen=2348&end_date=20251121, response=
+2025-11-21 01:10:06.950 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600402, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600402&scale=240&datalen=70000&end_date=20251121, response=
+2025-11-21 01:10:23.536 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600403, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600403&scale=240&datalen=27&end_date=20251121, response=

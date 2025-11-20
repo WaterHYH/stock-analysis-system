@@ -113,11 +113,12 @@ public class StockHistoryFetchService {
     private void processStock(int code) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
-            long duration = fetchAndSaveHistory(symbol);
-            if (duration > 1000) {
-                logger.info("执行耗时{}ms，总延迟{}ms", duration, duration*2);
+            int insertedCount = fetchAndSaveHistory(symbol);
+            // 只有实际插入了数据才需要延时（insertedCount > 0表示有新数据被插入）
+            if (insertedCount > 0) {
+                logger.info("成功插入{}条新记录，执行延时", insertedCount);
                 try {
-                    Thread.sleep(duration*2);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("历史数据获取被中断", e);
@@ -130,9 +131,9 @@ public class StockHistoryFetchService {
      * 获取并保存单个股票的历史数据
      * 优化：第一次获取全部数据，然后基于数据库最新记录日期实现增量同步
      * @param symbol 股票Symbol（例如 "sh600000"）
-     * @return 执行耗时（毫秒），不执行任何操作时返回0
+     * @return 实际插入数据库的记录数，如果没有插入任何数据则返回0
      */
-    public long fetchAndSaveHistory(String symbol) {
+    public int fetchAndSaveHistory(String symbol) {
         if (!StringUtils.hasText(symbol)) {
             logger.error("Symbol不能为空");
             return 0;
@@ -182,7 +183,7 @@ public class StockHistoryFetchService {
 
         if (historyList == null || historyList.isEmpty()) {
             logger.info("未获取到股票历史数据: symbol={}", symbol);
-            return System.currentTimeMillis() - totalStartTime;
+            return 0;
         }
 
         // 3. 数据转换阶段
@@ -215,7 +216,7 @@ public class StockHistoryFetchService {
         // 如果没有新记录，不需要执行后续处理
         if (newRecords.isEmpty()) {
             logger.info("✅ symbol={}的数据已是最新，没有新记录需要写入", symbol);
-            return System.currentTimeMillis() - totalStartTime;
+            return 0;
         }
 
         // 6. K线分析阶段（仅处理新记录）
@@ -244,7 +245,7 @@ public class StockHistoryFetchService {
         logger.info("✅ 成功保存股票历史数据: symbol={}, 新增数据数={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 过滤:{}ms, 分析:{}ms, 插入:{}ms)",
                 symbol, result.length, totalDuration, fetchDuration, mapDuration, filterDuration, analysisDuration, insertDuration);
 
-        return System.currentTimeMillis() - totalStartTime;  // 返回执行耗时
+        return result.length;  // 返回实际插入的记录数
     }
 
     /**

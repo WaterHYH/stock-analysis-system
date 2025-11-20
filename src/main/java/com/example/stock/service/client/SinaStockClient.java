@@ -132,7 +132,7 @@ public class SinaStockClient {
     public List<StockHistoryDTO> getStockHistory(String symbol, int datalen) {
         // 从symbol中提取code（去除前缀）
         String code = symbol.substring(2);
-        
+
         String endDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
         // 构造历史数据API请求URL，包含以下参数：
         // symbol: 股票代码（如sh600000、sz000001）
@@ -141,16 +141,17 @@ public class SinaStockClient {
         // end_date: 结束日期，格式为yyyyMMdd
         String url = String.format("%s?symbol=%s&scale=240&datalen=%d&end_date=%s",
                 API_HISTORY_URL, symbol, datalen, endDate);
-
+        String jsonResponse = "";
+        try {
         // 1. 获取原始 JSON 响应
-        String jsonResponse = restTemplate.getForObject(url, String.class);
+        jsonResponse = restTemplate.getForObject(url, String.class);
 
         // 2. 处理无效 symbol 返回的 "null" 字符串
         if ("null".equals(jsonResponse.trim())) {
             return Collections.emptyList();
         }
 
-        try {
+
             // 3. 使用 Fastjson 解析 JSON
             List<StockHistoryDTO> dtos = JSON.parseObject(
                     jsonResponse,
@@ -169,7 +170,7 @@ public class SinaStockClient {
             }
         } catch (Exception e) {
             // 5. 处理 JSON 解析异常
-            logger.error("股票数据解析失败: symbol={}, code={}, response={}", symbol, code, jsonResponse);
+            logger.error("股票数据解析失败: symbol={}, url={}, response={}", symbol, url, jsonResponse);
             return Collections.emptyList();
         }
     }
