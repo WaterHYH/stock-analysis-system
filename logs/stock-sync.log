@@ -1,3 +1,4 @@
 2025-11-21 00:01:02.296 [stock-sync-1] INFO  c.e.stock.scheduler.StockHistorySyncScheduler - 项目启动时开始同步股票历史数据，时间：2025-11-21T00:01:02.296873500
 2025-11-21 00:08:52.958 [stock-sync-1] INFO  c.e.stock.scheduler.StockHistorySyncScheduler - 项目启动时开始同步股票历史数据，时间：2025-11-21T00:08:52.958574500
 2025-11-21 00:28:55.208 [stock-sync-1] INFO  c.e.stock.scheduler.StockHistorySyncScheduler - 项目启动时开始同步股票历史数据，时间：2025-11-21T00:28:55.208852600
+2025-11-21 01:57:21.744 [stock-sync-1] INFO  c.e.stock.scheduler.StockHistorySyncScheduler - 项目启动时开始同步股票历史数据，时间：2025-11-21T01:57:21.744378800

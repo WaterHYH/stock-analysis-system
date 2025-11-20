@@ -124,6 +124,10 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>com.example.stock.StockApplication</mainClass>
+					<arguments>
+						<argument>-Dfile.encoding=UTF-8</argument>
+						<argument>-Dstdout.encoding=UTF-8</argument>
+					</arguments>
 				</configuration>
 			</plugin>
 			<plugin>
