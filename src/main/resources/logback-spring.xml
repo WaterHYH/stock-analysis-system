@@ -30,9 +30,6 @@
             <pattern>${LOG_PATTERN}</pattern>
             <charset>UTF-8</charset>
         </encoder>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <charset>UTF-8</charset>
-        </layout>
     </appender>
     
     <!-- 应用日志文件 -->
