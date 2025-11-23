@@ -128,8 +128,14 @@ public class StockHistoryFetchService {
             // 检查字典中是否存在该股票的同步记录
             if (syncLogMap.containsKey(symbol)) {
                 StockSyncLog syncLog = syncLogMap.get(symbol);
-                if (syncLog.getSyncDate().equals(LocalDate.now())) {
-                    logger.debug("今天已同步过此股票，跳过: symbol={}", symbol);
+                LocalDate syncDate = syncLog.getSyncDate();
+                LocalDate today = LocalDate.now();
+                LocalDate lastTradingDay = getLastTradingDay(today);
+                
+                // 如果同步时间是今天，或者是上一个交易日，都可以跳过
+                // 因为如果在非交易日同步，说明当时已经获取了最新的交易日数据
+                if (syncDate.equals(today) || syncDate.equals(lastTradingDay)) {
+                    logger.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
                     return;
                 }
             }
@@ -156,7 +162,7 @@ public class StockHistoryFetchService {
             if (insertedCount > 0) {
                 logger.info("成功插入{}条新记录，执行延时", insertedCount);
                 try {
-                    Thread.sleep(insertedCount*2);
+                    Thread.sleep(insertedCount*4);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("历史数据获取被中断", e);
