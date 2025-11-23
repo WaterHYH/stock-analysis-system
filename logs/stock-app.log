@@ -17001,3 +17001,209 @@
 2025-11-23 15:37:26.993 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
 2025-11-23 15:37:27.458 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 465ms, symbol=sh600142
 2025-11-23 15:37:27.458 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600142
+2025-11-23 15:37:32.533 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600143
+2025-11-23 15:37:33.187 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:37:39.566 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600144
+2025-11-23 15:37:40.314 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:37:41.377 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1063ms, symbol=sh600144
+2025-11-23 15:37:41.377 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600144
+2025-11-23 15:37:47.085 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600145
+2025-11-23 15:37:48.131 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2022-04-21, 将从2022-04-11开始处理，仅获取1332天的数据
+2025-11-23 15:37:49.619 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1487ms, symbol=sh600145
+2025-11-23 15:37:49.619 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=1332
+2025-11-23 15:37:49.619 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:37:49.620 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1332, 新记录数=0
+2025-11-23 15:37:49.620 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600145的数据已是最新，没有新记录需要写入
+2025-11-23 15:37:55.817 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600146
+2025-11-23 15:37:57.013 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2022-06-23, 将从2022-06-13开始处理，仅获取1269天的数据
+2025-11-23 15:37:58.545 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1531ms, symbol=sh600146
+2025-11-23 15:37:58.545 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=1269
+2025-11-23 15:37:58.545 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:37:58.545 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1269, 新记录数=0
+2025-11-23 15:37:58.545 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600146的数据已是最新，没有新记录需要写入
+2025-11-23 15:38:03.821 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600147
+2025-11-23 15:38:04.483 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:38:04.922 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 439ms, symbol=sh600147
+2025-11-23 15:38:04.922 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600147
+2025-11-23 15:38:09.896 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600148
+2025-11-23 15:38:10.560 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:15.750 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600149
+2025-11-23 15:38:16.401 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:22.689 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600150
+2025-11-23 15:38:23.356 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:28.516 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600151
+2025-11-23 15:38:29.177 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:33.786 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600152
+2025-11-23 15:38:34.438 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:39.999 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600153
+2025-11-23 15:38:40.647 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:45.238 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600154
+2025-11-23 15:38:45.901 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:38:46.337 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 436ms, symbol=sh600154
+2025-11-23 15:38:46.338 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600154
+2025-11-23 15:38:52.833 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600155
+2025-11-23 15:38:53.488 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:38:58.627 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600156
+2025-11-23 15:38:59.282 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:04.811 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600157
+2025-11-23 15:39:05.463 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:10.058 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600158
+2025-11-23 15:39:10.723 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:16.206 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600159
+2025-11-23 15:39:16.875 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:23.368 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600160
+2025-11-23 15:39:24.599 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:29.573 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600161
+2025-11-23 15:39:30.229 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:34.830 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600162
+2025-11-23 15:39:35.485 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:40.086 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600163
+2025-11-23 15:39:40.753 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:39:46.838 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600164
+2025-11-23 15:39:47.495 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:39:49.860 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2364ms, symbol=sh600164
+2025-11-23 15:39:49.860 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600164
+2025-11-23 15:39:55.105 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600165
+2025-11-23 15:39:55.767 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:00.378 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600166
+2025-11-23 15:40:01.038 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:06.423 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600167
+2025-11-23 15:40:07.079 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:11.704 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600168
+2025-11-23 15:40:12.366 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:18.665 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600169
+2025-11-23 15:40:19.332 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:25.039 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600170
+2025-11-23 15:40:25.701 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:31.395 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600171
+2025-11-23 15:40:32.608 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:37.782 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600172
+2025-11-23 15:40:38.430 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:43.037 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600173
+2025-11-23 15:40:43.699 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:40:48.320 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600174
+2025-11-23 15:40:49.499 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:40:49.740 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600174, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600174&scale=240&datalen=70000&end_date=20251123, response=
+2025-11-23 15:40:49.740 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 241ms, symbol=sh600174
+2025-11-23 15:40:49.740 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600174
+2025-11-23 15:40:54.316 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600175
+2025-11-23 15:40:54.968 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2020-08-07, 将从2020-07-28开始处理，仅获取1954天的数据
+2025-11-23 15:40:58.530 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 3561ms, symbol=sh600175
+2025-11-23 15:40:58.530 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=1954
+2025-11-23 15:40:58.530 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:40:58.530 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1954, 新记录数=0
+2025-11-23 15:40:58.530 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600175的数据已是最新，没有新记录需要写入
+2025-11-23 15:41:05.133 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600176
+2025-11-23 15:41:05.798 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:41:11.354 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600177
+2025-11-23 15:41:12.405 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:41:18.066 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600178
+2025-11-23 15:41:18.715 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:41:18.720 [stock-sync-1] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@baf6d4e (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2025-11-23 15:41:18.721 [stock-sync-1] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@487eb08d (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2025-11-23 15:41:18.721 [stock-sync-1] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@b445a80 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2025-11-23 15:41:18.721 [stock-sync-1] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@49bf3ce3 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2025-11-23 15:41:30.251 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600179
+2025-11-23 15:41:31.569 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:41:36.949 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600180
+2025-11-23 15:41:37.604 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:41:42.195 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600181
+2025-11-23 15:41:42.853 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2006-04-28, 将从2006-04-18开始处理，仅获取7169天的数据
+2025-11-23 15:41:44.060 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1207ms, symbol=sh600181
+2025-11-23 15:41:44.060 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=1797
+2025-11-23 15:41:44.060 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:41:44.060 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1797, 新记录数=0
+2025-11-23 15:41:44.060 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600181的数据已是最新，没有新记录需要写入
+2025-11-23 15:41:49.330 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600182
+2025-11-23 15:41:51.340 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:41:55.947 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600183
+2025-11-23 15:41:57.151 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:01.749 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600184
+2025-11-23 15:42:02.495 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:07.638 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600185
+2025-11-23 15:42:08.689 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:13.281 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600186
+2025-11-23 15:42:13.929 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:18.524 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600187
+2025-11-23 15:42:19.183 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:24.333 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600188
+2025-11-23 15:42:24.989 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:30.943 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600189
+2025-11-23 15:42:31.608 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:37.731 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600190
+2025-11-23 15:42:38.788 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2025-07-18, 将从2025-07-08开始处理，仅获取148天的数据
+2025-11-23 15:42:39.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 709ms, symbol=sh600190
+2025-11-23 15:42:39.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=148
+2025-11-23 15:42:39.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:42:39.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=148, 新记录数=0
+2025-11-23 15:42:39.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600190的数据已是最新，没有新记录需要写入
+2025-11-23 15:42:45.298 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600191
+2025-11-23 15:42:45.954 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:50.545 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600192
+2025-11-23 15:42:51.209 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:42:55.826 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600193
+2025-11-23 15:42:56.487 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:01.677 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600194
+2025-11-23 15:43:02.329 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:43:02.758 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 429ms, symbol=sh600194
+2025-11-23 15:43:02.758 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600194
+2025-11-23 15:43:07.375 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600195
+2025-11-23 15:43:08.030 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:13.024 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600196
+2025-11-23 15:43:14.214 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:19.923 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600197
+2025-11-23 15:43:20.572 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:25.150 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600198
+2025-11-23 15:43:25.804 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:31.874 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600199
+2025-11-23 15:43:32.522 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:38.051 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600200
+2025-11-23 15:43:39.232 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:44.985 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600201
+2025-11-23 15:43:45.642 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:50.744 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600202
+2025-11-23 15:43:51.404 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:43:56.555 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600203
+2025-11-23 15:43:57.205 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:44:01.809 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600204
+2025-11-23 15:44:02.466 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:44:02.765 [stock-sync-1] ERROR com.example.stock.service.client.SinaStockClient - 股票数据解析失败: symbol=sh600204, url=https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600204&scale=240&datalen=70000&end_date=20251123, response=
+2025-11-23 15:44:02.765 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 299ms, symbol=sh600204
+2025-11-23 15:44:02.765 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600204
+2025-11-23 15:44:07.358 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600205
+2025-11-23 15:44:08.404 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2007-01-09, 将从2006-12-30开始处理，仅获取6913天的数据
+2025-11-23 15:44:12.695 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 4290ms, symbol=sh600205
+2025-11-23 15:44:12.696 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 1ms, 记录数=1765
+2025-11-23 15:44:12.696 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:44:12.696 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1765, 新记录数=0
+2025-11-23 15:44:12.696 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600205的数据已是最新，没有新记录需要写入
+2025-11-23 15:44:20.062 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600206
+2025-11-23 15:44:20.711 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:44:26.848 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600207
+2025-11-23 15:44:27.500 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:44:32.091 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600208
+2025-11-23 15:44:32.750 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:44:37.364 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600209
+2025-11-23 15:44:38.029 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2022-06-15, 将从2022-06-05开始处理，仅获取1277天的数据
+2025-11-23 15:44:39.136 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1107ms, symbol=sh600209
+2025-11-23 15:44:39.136 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=1277
+2025-11-23 15:44:39.136 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:44:39.136 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1277, 新记录数=0
+2025-11-23 15:44:39.136 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600209的数据已是最新，没有新记录需要写入
+2025-11-23 15:44:45.884 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600210
+2025-11-23 15:44:46.550 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:44:51.157 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600211
+2025-11-23 15:44:51.817 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:44:56.962 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600212
+2025-11-23 15:44:57.618 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 数据库中最新记录已是最近的交易日(2025-11-21)，无需调用API，直接跳过
+2025-11-23 15:45:03.018 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600213
+2025-11-23 15:45:03.665 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中最新记录: 2024-08-15, 将从2024-08-05开始处理，仅获取485天的数据
+2025-11-23 15:45:04.628 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 962ms, symbol=sh600213
+2025-11-23 15:45:04.629 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=485
+2025-11-23 15:45:04.629 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-23 15:45:04.629 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=485, 新记录数=0
+2025-11-23 15:45:04.629 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ symbol=sh600213的数据已是最新，没有新记录需要写入
+2025-11-23 15:45:10.316 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sh600214
+2025-11-23 15:45:10.967 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-23 15:45:11.681 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 714ms, symbol=sh600214
+2025-11-23 15:45:11.681 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 未获取到股票历史数据: symbol=sh600214
