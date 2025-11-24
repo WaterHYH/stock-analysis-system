@@ -42,7 +42,7 @@ public class StockHistorySyncScheduler {
     public void syncStockHistoryDaily() {
         syncTaskExecutor.execute(() -> {
             logger.info("开始每日定时同步股票历史数据，时间：{}", LocalDateTime.now());
-            historyFetchService.fetchAllStockHistory();
+            //historyFetchService.fetchAllStockHistory();
             logger.info("每日股票历史数据同步完成");
         });
     }

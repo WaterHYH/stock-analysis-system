@@ -103,16 +103,8 @@ public class StockHistoryFetchService {
             processStock(code, syncLogMap);
         }
 
-        // 北交所 (83, 87, 88, 89)
-        logger.info("正在获取北交所股票数据 (83, 87, 88, 89)...");
-        int[] bjPrefixes = {83, 87, 88, 89};
-        for (int prefix : bjPrefixes) {
-            int start = prefix * 10000;
-            int end = start + 9999;
-            for (int code = start; code <= end; code++) {
-                processStock(code, syncLogMap);
-            }
-        }
+        // 不需要北交所 (83, 87, 88, 89)
+
 
         logger.info("✅ 所有A股股票历史数据获取完成");
     }
@@ -159,11 +151,12 @@ public class StockHistoryFetchService {
                 syncLogMap.put(symbol, syncLog);
             }
 
-            // 只有实际插入了数据才需要延时
-            if (insertedCount > 0) {
-                logger.info("成功插入{}条新记录，以非阻塞方式执行延时", insertedCount);
-                // 使用一步任务执行延时，不阻塞当前线程
-                scheduleDelayAsync(insertedCount * 10L);
+            try {
+                logger.info("成功插入{}条新记录，执行延时", insertedCount);
+                Thread.sleep(3000+insertedCount);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warn("非阻塞延时被中断", e);
             }
         }
     }
@@ -350,22 +343,5 @@ public class StockHistoryFetchService {
             return date.minusDays(2); // 返回周五
         }
         return date; // 工作日直接返回
-    }
-
-    /**
-     * 以非阻塞的方式执行延时
-     * 使用线程池中的一步任务执行延时，不阻塞当前线程
-     * @param delayMillis 延时毫秒数
-     */
-    private void scheduleDelayAsync(long delayMillis) {
-        syncTaskExecutor.execute(() -> {
-            try {
-                Thread.sleep(delayMillis);
-                logger.debug("非阻塞延时完成: {}ms", delayMillis);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.warn("非阻塞延时被中断", e);
-            }
-        });
     }
 }
