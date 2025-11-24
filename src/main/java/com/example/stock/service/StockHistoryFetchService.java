@@ -10,6 +10,7 @@ import com.example.stock.service.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +32,7 @@ public class StockHistoryFetchService {
     private final StockSyncLogRepository stockSyncLogRepository;
     private final StockMapper stockMapper;
     private final KLineAnalysisService kLineAnalysisService;
+    private final TaskExecutor syncTaskExecutor;
 
     /**
      * 批量获取所有A股股票历史数据
@@ -129,13 +131,14 @@ public class StockHistoryFetchService {
             if (syncLogMap.containsKey(symbol)) {
                 StockSyncLog syncLog = syncLogMap.get(symbol);
                 LocalDate syncDate = syncLog.getSyncDate();
-                
+
                 // 如果同步日期是周末，说明上次运行时已经获取了最新的交易日数据，可以跳过
                 // 如果同步日期是今天，也可以跳过
                 if (isWeekend(syncDate) || syncDate.equals(LocalDate.now())) {
                     logger.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
                     return;
                 }
+                logger.debug("股票已同步过（同步日期: {}）: symbol={}", syncDate, symbol);
             }
 
             int insertedCount = fetchAndSaveHistory(symbol);
@@ -158,13 +161,9 @@ public class StockHistoryFetchService {
 
             // 只有实际插入了数据才需要延时
             if (insertedCount > 0) {
-                logger.info("成功插入{}条新记录，执行延时", insertedCount);
-                try {
-                    Thread.sleep(insertedCount*4);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("历史数据获取被中断", e);
-                }
+                logger.info("成功插入{}条新记录，以非阻塞方式执行延时", insertedCount);
+                // 使用一步任务执行延时，不阻塞当前线程
+                scheduleDelayAsync(insertedCount * 10L);
             }
         }
     }
@@ -351,5 +350,22 @@ public class StockHistoryFetchService {
             return date.minusDays(2); // 返回周五
         }
         return date; // 工作日直接返回
+    }
+
+    /**
+     * 以非阻塞的方式执行延时
+     * 使用线程池中的一步任务执行延时，不阻塞当前线程
+     * @param delayMillis 延时毫秒数
+     */
+    private void scheduleDelayAsync(long delayMillis) {
+        syncTaskExecutor.execute(() -> {
+            try {
+                Thread.sleep(delayMillis);
+                logger.debug("非阻塞延时完成: {}ms", delayMillis);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warn("非阻塞延时被中断", e);
+            }
+        });
     }
 }
