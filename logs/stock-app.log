@@ -1698,3 +1698,165 @@ java.lang.InterruptedException: sleep interrupted
 2025-11-25 01:21:23.430 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3842条新记录，执行延时
 2025-11-25 01:21:30.276 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300015
 2025-11-25 01:21:31.370 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:21:34.084 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2714ms, symbol=sz300015
+2025-11-25 01:21:34.084 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=3880
+2025-11-25 01:21:34.084 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:21:34.084 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3880, 新记录数=3880
+2025-11-25 01:21:34.144 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 60ms, 记录数=3880
+2025-11-25 01:21:35.224 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3880
+2025-11-25 01:21:56.244 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3880, 耗时=21020ms, 平均=0.18/ms
+2025-11-25 01:21:57.336 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 23192ms, 记录数=3880
+2025-11-25 01:21:57.336 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300015, 新增数据数=3880, 总耗时=27060ms (获取:2714ms, 转换:0ms, 过滤:0ms, 分析:60ms, 插入:23192ms)
+2025-11-25 01:22:02.293 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3880条新记录，执行延时
+2025-11-25 01:22:09.182 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300016
+2025-11-25 01:22:10.264 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:22:12.318 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2054ms, symbol=sz300016
+2025-11-25 01:22:12.320 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 2ms, 记录数=3813
+2025-11-25 01:22:12.321 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 1ms
+2025-11-25 01:22:12.321 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3813, 新记录数=3813
+2025-11-25 01:22:12.396 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 75ms, 记录数=3813
+2025-11-25 01:22:13.480 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3813
+2025-11-25 01:22:32.384 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3813, 耗时=18904ms, 平均=0.20/ms
+2025-11-25 01:22:33.494 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 21096ms, 记录数=3813
+2025-11-25 01:22:33.494 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300016, 新增数据数=3813, 总耗时=24312ms (获取:2054ms, 转换:2ms, 过滤:0ms, 分析:75ms, 插入:21096ms)
+2025-11-25 01:22:37.336 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3813条新记录，执行延时
+2025-11-25 01:22:44.150 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300017
+2025-11-25 01:22:45.244 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:22:47.275 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2031ms, symbol=sz300017
+2025-11-25 01:22:47.275 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=3850
+2025-11-25 01:22:47.275 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:22:47.275 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3850, 新记录数=3850
+2025-11-25 01:22:47.334 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 59ms, 记录数=3850
+2025-11-25 01:22:48.425 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3850
+2025-11-25 01:23:09.785 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3850, 耗时=21360ms, 平均=0.18/ms
+2025-11-25 01:23:11.074 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 23740ms, 记录数=3850
+2025-11-25 01:23:11.074 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300017, 新增数据数=3850, 总耗时=26924ms (获取:2031ms, 转换:0ms, 过滤:0ms, 分析:59ms, 插入:23740ms)
+2025-11-25 01:23:14.914 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3850条新记录，执行延时
+2025-11-25 01:23:21.774 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300018
+2025-11-25 01:23:23.254 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:23:25.614 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2360ms, symbol=sz300018
+2025-11-25 01:23:25.614 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=3808
+2025-11-25 01:23:25.614 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:23:25.614 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3808, 新记录数=3808
+2025-11-25 01:23:25.679 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 65ms, 记录数=3808
+2025-11-25 01:23:26.778 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3808
+2025-11-25 01:23:48.324 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3808, 耗时=21546ms, 平均=0.18/ms
+2025-11-25 01:23:49.434 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 23755ms, 记录数=3808
+2025-11-25 01:23:49.434 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300018, 新增数据数=3808, 总耗时=27660ms (获取:2360ms, 转换:0ms, 过滤:0ms, 分析:65ms, 插入:23755ms)
+2025-11-25 01:23:53.653 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3808条新记录，执行延时
+2025-11-25 01:24:00.462 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300019
+2025-11-25 01:24:01.554 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:24:03.724 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2170ms, symbol=sz300019
+2025-11-25 01:24:03.724 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=3822
+2025-11-25 01:24:03.724 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:24:03.724 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3822, 新记录数=3822
+2025-11-25 01:24:03.784 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 60ms, 记录数=3822
+2025-11-25 01:24:04.878 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3822
+2025-11-25 01:24:29.640 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3822, 耗时=24761ms, 平均=0.15/ms
+2025-11-25 01:24:30.734 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 26950ms, 记录数=3822
+2025-11-25 01:24:30.734 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300019, 新增数据数=3822, 总耗时=30272ms (获取:2170ms, 转换:0ms, 过滤:0ms, 分析:60ms, 插入:26950ms)
+2025-11-25 01:24:35.741 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3822条新记录，执行延时
+2025-11-25 01:24:42.565 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300020
+2025-11-25 01:24:43.679 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:24:45.790 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2111ms, symbol=sz300020
+2025-11-25 01:24:45.791 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 1ms, 记录数=3724
+2025-11-25 01:24:45.791 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:24:45.791 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3724, 新记录数=3724
+2025-11-25 01:24:45.849 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 58ms, 记录数=3724
+2025-11-25 01:24:46.964 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3724
+2025-11-25 01:25:11.578 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3724, 耗时=24614ms, 平均=0.15/ms
+2025-11-25 01:25:12.901 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 27052ms, 记录数=3724
+2025-11-25 01:25:12.901 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300020, 新增数据数=3724, 总耗时=30336ms (获取:2111ms, 转换:1ms, 过滤:0ms, 分析:58ms, 插入:27052ms)
+2025-11-25 01:25:17.584 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3724条新记录，执行延时
+2025-11-25 01:25:24.311 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300021
+2025-11-25 01:25:25.815 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:25:28.106 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2291ms, symbol=sz300021
+2025-11-25 01:25:28.107 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 1ms, 记录数=3866
+2025-11-25 01:25:28.107 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:25:28.107 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3866, 新记录数=3866
+2025-11-25 01:25:28.164 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 57ms, 记录数=3866
+2025-11-25 01:25:29.286 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3866
+2025-11-25 01:25:52.342 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3866, 耗时=23055ms, 平均=0.17/ms
+2025-11-25 01:25:53.464 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 25300ms, 记录数=3866
+2025-11-25 01:25:53.464 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300021, 新增数据数=3866, 总耗时=29153ms (获取:2291ms, 转换:1ms, 过滤:0ms, 分析:57ms, 插入:25300ms)
+2025-11-25 01:25:57.764 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3866条新记录，执行延时
+2025-11-25 01:26:04.635 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300022
+2025-11-25 01:26:05.754 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:26:07.854 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2100ms, symbol=sz300022
+2025-11-25 01:26:07.854 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=3698
+2025-11-25 01:26:07.854 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:26:07.854 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3698, 新记录数=3698
+2025-11-25 01:26:07.904 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 50ms, 记录数=3698
+2025-11-25 01:26:09.414 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3698
+2025-11-25 01:26:28.024 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3698, 耗时=18600ms, 平均=0.20/ms
+2025-11-25 01:26:29.154 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 21250ms, 记录数=3698
+2025-11-25 01:26:29.154 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300022, 新增数据数=3698, 总耗时=24519ms (获取:2100ms, 转换:0ms, 过滤:0ms, 分析:50ms, 插入:21250ms)
+2025-11-25 01:26:33.068 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3698条新记录，执行延时
+2025-11-25 01:26:39.768 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300023
+2025-11-25 01:26:40.884 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:26:42.646 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1762ms, symbol=sz300023
+2025-11-25 01:26:42.671 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 25ms, 记录数=2941
+2025-11-25 01:26:42.671 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:26:42.672 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=2941, 新记录数=2941
+2025-11-25 01:26:42.712 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 40ms, 记录数=2941
+2025-11-25 01:26:43.831 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=2941
+2025-11-25 01:27:00.164 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=2941, 耗时=16333ms, 平均=0.18/ms
+2025-11-25 01:27:01.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 18785ms, 记录数=2941
+2025-11-25 01:27:01.497 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300023, 新增数据数=2941, 总耗时=21729ms (获取:1762ms, 转换:25ms, 过滤:0ms, 分析:40ms, 插入:18785ms)
+2025-11-25 01:27:05.804 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入2941条新记录，执行延时
+2025-11-25 01:27:11.747 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300024
+2025-11-25 01:27:12.866 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:27:14.813 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1947ms, symbol=sz300024
+2025-11-25 01:27:14.814 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 1ms, 记录数=3894
+2025-11-25 01:27:14.814 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:27:14.814 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3894, 新记录数=3894
+2025-11-25 01:27:14.879 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 65ms, 记录数=3894
+2025-11-25 01:27:15.997 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3894
+2025-11-25 01:27:37.138 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3894, 耗时=21141ms, 平均=0.18/ms
+2025-11-25 01:27:38.453 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 23574ms, 记录数=3894
+2025-11-25 01:27:38.453 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300024, 新增数据数=3894, 总耗时=26706ms (获取:1947ms, 转换:1ms, 过滤:0ms, 分析:65ms, 插入:23574ms)
+2025-11-25 01:27:42.251 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3894条新记录，执行延时
+2025-11-25 01:27:49.146 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300025
+2025-11-25 01:27:50.619 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:27:52.948 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2329ms, symbol=sz300025
+2025-11-25 01:27:52.954 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 6ms, 记录数=3487
+2025-11-25 01:27:52.954 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:27:52.954 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3487, 新记录数=3487
+2025-11-25 01:27:53.004 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 50ms, 记录数=3487
+2025-11-25 01:27:54.085 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3487
+2025-11-25 01:28:20.484 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3487, 耗时=26399ms, 平均=0.13/ms
+2025-11-25 01:28:21.580 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 28576ms, 记录数=3487
+2025-11-25 01:28:21.580 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300025, 新增数据数=3487, 总耗时=32434ms (获取:2329ms, 转换:6ms, 过滤:0ms, 分析:50ms, 插入:28576ms)
+2025-11-25 01:28:25.814 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3487条新记录，执行延时
+2025-11-25 01:28:32.310 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300026
+2025-11-25 01:28:33.784 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:28:35.807 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 2023ms, symbol=sz300026
+2025-11-25 01:28:35.807 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=3781
+2025-11-25 01:28:35.807 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:28:35.808 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3781, 新记录数=3781
+2025-11-25 01:28:35.975 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 167ms, 记录数=3781
+2025-11-25 01:28:37.060 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3781
+2025-11-25 01:28:59.654 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3781, 耗时=22594ms, 平均=0.17/ms
+2025-11-25 01:29:01.143 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 25168ms, 记录数=3781
+2025-11-25 01:29:01.143 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300026, 新增数据数=3781, 总耗时=28833ms (获取:2023ms, 转换:0ms, 过滤:0ms, 分析:167ms, 插入:25168ms)
+2025-11-25 01:29:04.954 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3781条新记录，执行延时
+2025-11-25 01:29:11.740 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300027
+2025-11-25 01:29:13.214 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:29:14.663 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1449ms, symbol=sz300027
+2025-11-25 01:29:14.664 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 1ms, 记录数=3708
+2025-11-25 01:29:14.664 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:29:14.664 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=3708, 新记录数=3708
+2025-11-25 01:29:14.724 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 60ms, 记录数=3708
+2025-11-25 01:29:15.803 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=3708
+2025-11-25 01:29:33.668 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 批量插入完成: 记录数=3708, 耗时=17865ms, 平均=0.21/ms
+2025-11-25 01:29:34.761 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 批量插入耗时: 20037ms, 记录数=3708
+2025-11-25 01:29:34.761 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ✅ 成功保存股票历史数据: symbol=sz300027, 新增数据数=3708, 总耗时=23021ms (获取:1449ms, 转换:1ms, 过滤:0ms, 分析:60ms, 插入:20037ms)
+2025-11-25 01:29:38.554 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 成功插入3708条新记录，执行延时
+2025-11-25 01:29:45.270 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 开始获取股票历史数据: symbol=sz300028
+2025-11-25 01:29:46.351 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - 数据库中无此股票数据，将推出全量获取
+2025-11-25 01:29:47.948 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 获取数据耗时: 1597ms, symbol=sz300028
+2025-11-25 01:29:47.948 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据转换耗时: 0ms, 记录数=1783
+2025-11-25 01:29:47.948 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 数据排序完成，按日期降序排列，耗时: 0ms
+2025-11-25 01:29:47.948 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ 过滤新记录耗时: 0ms, 原数据=1783, 新记录数=1783
+2025-11-25 01:29:47.964 [stock-sync-1] INFO  c.example.stock.service.StockHistoryFetchService - ⏱️ K线分析耗时: 16ms, 记录数=1783
+2025-11-25 01:29:49.049 [stock-sync-1] INFO  c.e.s.repository.StockHistoryCustomRepositoryImpl - 一次性批量插入: 总记录数=1783

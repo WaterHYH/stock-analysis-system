@@ -139,7 +139,7 @@ public class StockHistoryFetchService {
 
             try {
                 logger.info("成功插入{}条新记录，执行延时", insertedCount);
-                Thread.sleep(3000+insertedCount);
+                Thread.sleep(3000+insertedCount*5L);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.warn("非阻塞延时被中断", e);
