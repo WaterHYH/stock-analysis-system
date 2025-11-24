@@ -36,7 +36,7 @@ public class StockHistoryFetchService {
 
     /**
      * 批量获取所有A股股票历史数据
-     * 覆盖沪市（A股）、深市、北交所的所有股票代码
+     * 覆盖沪市（A股）、深市的所有股票代码
      *
      * 沪市（A股）:
      *   - 600-605: 主板 (600000-605999)
@@ -47,12 +47,9 @@ public class StockHistoryFetchService {
      *
      * 深市:
      *   - 000-003: 主板 (000000-003999)
-     *   - 100-103: 中小板 (100000-103999)
      *   - 300: 创业板 (300000-300999)
-     *   - 004-009: 创业板 (004000-009999)
      *
-     * 北交所:
-     *   - 83, 87, 88, 89: 北交所股票 (830000-899999)
+     * 注：中小板已于2020年与主板合并，不存在100开头的股票
      */
     public void fetchAllStockHistory() {
         logger.info("开始批量获取所有A股股票历史数据...");
@@ -84,26 +81,15 @@ public class StockHistoryFetchService {
 
         // 深市主板 (000-003)
         logger.info("正在获取深市主板股票数据 (000-003)...");
-        for (int code = 0; code <= 3999; code++) {
+        for (int code = 1; code <= 3999; code++) {
             processStock(code, syncLogMap);
         }
 
-        // 深市中小板 (100-103)
-        logger.info("正在获取深市中小板股票数据 (100-103)...");
-        for (int code = 100000; code <= 103999; code++) {
-            processStock(code, syncLogMap);
-        }
-
-        // 深市创业板 (300, 004-009)
-        logger.info("正在获取深市创业板股票数据 (300, 004-009)...");
+        // 深市创业板 (300)
+        logger.info("正在获取深市创业板股票数据 (300)...");
         for (int code = 300000; code <= 399999; code++) {
             processStock(code, syncLogMap);
         }
-        for (int code = 4000; code <= 99999; code++) {
-            processStock(code, syncLogMap);
-        }
-
-        // 不需要北交所 (83, 87, 88, 89)
 
 
         logger.info("✅ 所有A股股票历史数据获取完成");
@@ -284,18 +270,17 @@ public class StockHistoryFetchService {
 
     /**
      * 根据股票代码生成股票symbol
-     * 沪京交易所 (sh): 60xxxx, 607xxx, 608xxx, 609xxx, 688xxx
-     * 深圳交易所 (sz): 000xxx-099xxx, 100xxx-103xxx, 300xxx
-     * 北京交易所 (bj): 83xxxx, 87xxxx, 88xxxx, 89xxxx
+     * 沪市 (sh): 60xxxx, 607xxx, 608xxx, 609xxx, 688xxx
+     * 深市 (sz): 000xxx-003xxx (主板), 300xxx (创业板)
      * @param code 股票代码
-     * @return 股票symbol（如sh600000或sz000001或bj830000）
+     * @return 股票symbol（如sh600000或sz000001）
      */
     private String generateSymbol(int code) {
         String paddedCode = String.format("%06d", code);
         String twoDigitPrefix = paddedCode.substring(0, 2);
         int prefixValue = Integer.parseInt(twoDigitPrefix);
 
-        // 沪京交易所 (A股) - 60开头、607-609、688
+        // 沪市 (A股) - 60开头、607-609、688
         if (paddedCode.startsWith("60") || paddedCode.startsWith("688")) {
             return "sh" + paddedCode;
         }
@@ -303,17 +288,9 @@ public class StockHistoryFetchService {
         else if (prefixValue >= 607 && prefixValue <= 609) {
             return "sh" + paddedCode;
         }
-        // 深圳交易所 (A股) - 北交所号段外的数字
-        // 000-099 (主板、中小板、创业板混合)
-        // 100-103 (中小板)
-        // 300-309+ (创业板)
-        else if (prefixValue <= 103 || prefixValue == 300) {
+        // 深市 (A股) - 000-003 (主板) 或 300 (创业板)
+        else if ((prefixValue >= 0 && prefixValue <= 3) || prefixValue == 300) {
             return "sz" + paddedCode;
-        }
-        // 北京交易所 (A股) - 83, 87, 88, 89
-        else if (prefixValue == 83 || prefixValue == 87
-                 || prefixValue == 88 || prefixValue == 89) {
-            return "bj" + paddedCode;
         }
         else {
             return null;
