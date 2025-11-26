@@ -105,44 +105,52 @@ public class StockHistoryFetchService {
     private void processStock(int code, Map<String, StockSyncLog> syncLogMap) {
         String symbol = generateSymbol(code);
         if (symbol != null) {
-            // 检查字典中是否存在该股票的同步记录
-            if (syncLogMap.containsKey(symbol)) {
-                StockSyncLog syncLog = syncLogMap.get(symbol);
-                LocalDate syncDate = syncLog.getSyncDate();
-
-                // 如果同步日期是周末，说明上次运行时已经获取了最新的交易日数据，可以跳过
-                // 如果同步日期是今天，也可以跳过
-                if (isWeekend(syncDate) || syncDate.equals(LocalDate.now())) {
-                    logger.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
-                    return;
-                }
-                logger.debug("股票已同步过（同步日期: {}）: symbol={}", syncDate, symbol);
-            }
-
-            int insertedCount = fetchAndSaveHistory(symbol);
-            // 对于同步日志的处理：
-            // 1. 字典中存在该股票 -> 更新sync_date
-            // 2. 字典中不存在 -> 创建新记录
-            if (syncLogMap.containsKey(symbol)) {
-                // 更新现有记录
-                StockSyncLog syncLog = syncLogMap.get(symbol);
-                syncLog.setSyncDate(LocalDate.now());
-                stockSyncLogRepository.save(syncLog);
-            } else {
-                // 创建新记录
-                StockSyncLog syncLog = new StockSyncLog();
-                syncLog.setSymbol(symbol);
-                syncLog.setSyncDate(LocalDate.now());
-                stockSyncLogRepository.save(syncLog);
-                syncLogMap.put(symbol, syncLog);
-            }
-
             try {
-                logger.info("成功插入{}条新记录，执行延时", insertedCount);
-                Thread.sleep(3000+insertedCount*5L);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.warn("非阻塞延时被中断", e);
+                // 检查字典中是否存在该股票的同步记录
+                if (syncLogMap.containsKey(symbol)) {
+                    StockSyncLog syncLog = syncLogMap.get(symbol);
+                    LocalDate syncDate = syncLog.getSyncDate();
+
+                    // 如果同步日期是周末，说明上次运行时已经获取了最新的交易日数据，可以跳过
+                    // 如果同步日期是今天，也可以跳过
+                    if (isWeekend(syncDate) || syncDate.equals(LocalDate.now())) {
+                        logger.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
+                        return;
+                    }
+                    logger.debug("股票已同步过（同步日期: {}）: symbol={}", syncDate, symbol);
+                }
+
+                int insertedCount = fetchAndSaveHistory(symbol);
+                // 对于同步日志的处理：
+                // 1. 字典中存在该股票 -> 更新sync_date
+                // 2. 字典中不存在 -> 创建新记录
+                if (syncLogMap.containsKey(symbol)) {
+                    // 更新现有记录
+                    StockSyncLog syncLog = syncLogMap.get(symbol);
+                    syncLog.setSyncDate(LocalDate.now());
+                    stockSyncLogRepository.save(syncLog);
+                } else {
+                    // 创建新记录
+                    StockSyncLog syncLog = new StockSyncLog();
+                    syncLog.setSymbol(symbol);
+                    syncLog.setSyncDate(LocalDate.now());
+                    stockSyncLogRepository.save(syncLog);
+                    syncLogMap.put(symbol, syncLog);
+                }
+
+                if (insertedCount > 0) {
+                    try {
+                        logger.info("成功插入{}条新记录，执行延时", insertedCount);
+                        Thread.sleep(3000 + insertedCount * 5L);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        logger.warn("延时被中断", e);
+                    }
+                }
+            } catch (org.springframework.dao.DataAccessResourceFailureException e) {
+                logger.error("数据库连接异常，跳过该股票: symbol={}, 错误: {}", symbol, e.getMessage());
+            } catch (Exception e) {
+                logger.error("处理股票时发生异常: symbol={}, 错误: {}", symbol, e.getMessage(), e);
             }
         }
     }
