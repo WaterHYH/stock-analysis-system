@@ -110,10 +110,11 @@ public class StockHistoryFetchService {
                 if (syncLogMap.containsKey(symbol)) {
                     StockSyncLog syncLog = syncLogMap.get(symbol);
                     LocalDate syncDate = syncLog.getSyncDate();
+                    LocalDate nowDate = LocalDate.now();
 
                     // 如果同步日期是周末，说明上次运行时已经获取了最新的交易日数据，可以跳过
                     // 如果同步日期是今天，也可以跳过
-                    if (isWeekend(syncDate) || syncDate.equals(LocalDate.now())) {
+                    if (isWeekend(nowDate) || syncDate.equals(nowDate)) {
                         logger.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
                         return;
                     }
