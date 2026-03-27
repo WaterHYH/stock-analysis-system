@@ -1,0 +1,11 @@
+/.tools/
+/target/
+/repo_unzipped/
+/.trae/
+/.idea/
+/.vscode/
+*.log
+*.gz
+*.sql
+*.zip
+*.jar
