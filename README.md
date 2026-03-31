@@ -115,9 +115,48 @@ CREATE DATABASE stock_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 编辑 `src/main/resources/application.properties`，配置数据库连接信息。
 
 ### 4. 运行项目
-```bash
-mvn clean install
-mvn spring-boot:run
+
+#### 打包项目
+```powershell
+# 进入项目目录
+Set-Location "c:\Users\water\Documents\trae_projects\stock-analysis-system"
+
+# 打包（跳过测试）
+.\mvnw.cmd clean package spring-boot:repackage -DskipTests
+```
+
+#### 启动应用
+```powershell
+# 停止旧进程（如有）
+$processId = (Get-NetTCPConnection -LocalPort 8080).OwningProcess
+Stop-Process -Id $processId -Force
+
+# 设置UTF-8编码（解决中文乱码）
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$env:JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8"
+
+# 启动应用
+java -jar target\demo-0.0.1-SNAPSHOT.jar
+```
+
+#### 一键启动（推荐）
+```powershell
+# 进入项目目录
+Set-Location "c:\Users\water\Documents\trae_projects\stock-analysis-system"
+
+# 先停止旧进程（避免JAR文件被占用）
+$processId = (Get-NetTCPConnection -LocalPort 8080).OwningProcess
+Stop-Process -Id $processId -Force
+
+# 打包
+.\mvnw.cmd clean package spring-boot:repackage -DskipTests
+
+# 设置UTF-8编码（解决中文乱码）
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$env:JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8"
+
+# 启动应用
+java -jar target\demo-0.0.1-SNAPSHOT.jar
 ```
 
 ### 5. 访问应用
