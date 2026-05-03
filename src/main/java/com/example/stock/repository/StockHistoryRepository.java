@@ -249,4 +249,11 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
         WHERE symbol = :symbol
         """, nativeQuery = true)
     LocalDate findLatestTradeDateBySymbol(@Param("symbol") String symbol);
+
+    /**
+     * 批量查询多个股票的历史数据
+     * @param symbols 股票代码列表
+     * @return 股票历史数据列表
+     */
+    List<StockHistory> findBySymbolInOrderBySymbolAscDayDesc(@Param("symbols") List<String> symbols);
 }

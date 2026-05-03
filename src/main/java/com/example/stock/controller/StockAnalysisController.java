@@ -3,8 +3,7 @@ package com.example.stock.controller;
 import com.example.stock.dto.StockAnalysisDTO;
 import com.example.stock.service.StockAnalysisService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,20 +13,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * 股票分析Web页面控制器
  * 提供股票分析筛选功能
  */
+@Slf4j
 @Controller
 @RequestMapping("/stock-analysis")
 @RequiredArgsConstructor
 public class StockAnalysisController {
-    
-    private static final Logger logger = LoggerFactory.getLogger(StockAnalysisController.class);
     
     private final StockAnalysisService stockAnalysisService;
 
@@ -88,13 +85,13 @@ public class StockAnalysisController {
     private List<StockAnalysisDTO> analyzeStocksWithParams(List<String> conditions, LocalDate startDate, 
             Double dropPercentage, LocalDate goldenCrossDate) {
         long startTime = System.currentTimeMillis();
-        logger.info("开始根据条件分析股票: {}, startDate: {}, dropPercentage: {}, goldenCrossDate: {}", 
+        log.info("开始根据条件分析股票: {}, startDate: {}, dropPercentage: {}, goldenCrossDate: {}", 
                 conditions, startDate, dropPercentage, goldenCrossDate);
         
         List<StockAnalysisDTO> allResults = new ArrayList<>();
         
         if (conditions == null || conditions.isEmpty()) {
-            logger.info("条件列表为空，返回空结果");
+            log.info("条件列表为空，返回空结果");
             return allResults;
         }
         
@@ -124,7 +121,7 @@ public class StockAnalysisController {
         }
         
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("条件分析完成，共找到 {} 只符合条件的股票，总耗时 {}ms", allResults.size(), totalTime);
+        log.info("条件分析完成，共找到 {} 只符合条件的股票，总耗时 {}ms", allResults.size(), totalTime);
         
         return allResults;
     }

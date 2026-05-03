@@ -2,8 +2,7 @@ package com.example.stock.service;
 
 import com.example.stock.entity.StockHistory;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,11 +11,22 @@ import java.util.List;
  * K线技术分析服务
  * 提供各种技术指标的计算和K线形态识别
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KLineAnalysisService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(KLineAnalysisService.class);
+
+    private static final double DOJI_THRESHOLD = 0.05;
+    private static final double HAMMER_SHADOW_MULTIPLIER = 2;
+    private static final double HAMMER_BODY_RATIO = 20;
+    private static final double VOLUME_SURGE_RATIO = 1.5;
+    private static final double VOLUME_SHRINK_RATIO = 0.5;
+    private static final double PRICE_VOLUME_MATCH_RISE = 1.2;
+    private static final double PRICE_VOLUME_MATCH_FALL = 0.8;
+    private static final double RSI_OVERBOUGHT = 80;
+    private static final double RSI_OVERSOLD = 20;
+    private static final int BOLL_PERIOD = 20;
+    private static final double BOLL_STD_MULTIPLIER = 2.0;
     
     /**
      * 对单条历史数据进行技术分析
@@ -55,7 +65,7 @@ public class KLineAnalysisService {
             calculateBOLL(currentData, historyDataList);
             
         } catch (Exception e) {
-            logger.error("分析K线数据失败: symbol={}, date={}, error={}", 
+            log.error("分析K线数据失败: symbol={}, date={}, error={}", 
                 currentData.getSymbol(), currentData.getDay(), e.getMessage());
         }
     }
@@ -150,7 +160,7 @@ public class KLineAnalysisService {
         double body = Math.abs(close - open);
         
         // K线类型: 0-阴线, 1-阳线, 2-十字星
-        if (body / range < 0.05) {
+        if (body / range < DOJI_THRESHOLD) {
             current.setKlineType(2); // 十字星
             current.setIsDoji(true);
         } else if (close > open) {
@@ -171,15 +181,15 @@ public class KLineAnalysisService {
         current.setBodyRatio(body / range * 100);
         
         // 锤子线: 下影线长(>实体2倍), 上影线短(<实体), 实体小(<20%)
-        boolean isHammer = lowerShadow > body * 2 
+        boolean isHammer = lowerShadow > body * HAMMER_SHADOW_MULTIPLIER 
             && upperShadow < body 
-            && current.getBodyRatio() < 20;
+            && current.getBodyRatio() < HAMMER_BODY_RATIO;
         current.setIsHammer(isHammer);
         
         // 倒锤子线: 上影线长(>实体2倍), 下影线短(<实体), 实体小(<20%)
-        boolean isInvertedHammer = upperShadow > body * 2 
+        boolean isInvertedHammer = upperShadow > body * HAMMER_SHADOW_MULTIPLIER 
             && lowerShadow < body 
-            && current.getBodyRatio() < 20;
+            && current.getBodyRatio() < HAMMER_BODY_RATIO;
         current.setIsInvertedHammer(isInvertedHammer);
     }
     
@@ -257,16 +267,16 @@ public class KLineAnalysisService {
         current.setVolumeRatio(volumeRatio);
         
         // 放量: 成交量 > 1.5倍MA5
-        current.setIsVolumeSurge(volumeRatio > 1.5);
+        current.setIsVolumeSurge(volumeRatio > VOLUME_SURGE_RATIO);
         
         // 缩量: 成交量 < 0.5倍MA5
-        current.setIsVolumeShrink(volumeRatio < 0.5);
+        current.setIsVolumeShrink(volumeRatio < VOLUME_SHRINK_RATIO);
         
         // 量价配合: (涨幅>0且放量) 或 (跌幅<0且缩量)
         Double changePercent = current.getChangePercent();
         if (changePercent != null) {
-            boolean match = (changePercent > 0 && volumeRatio > 1.2) 
-                || (changePercent < 0 && volumeRatio < 0.8);
+            boolean match = (changePercent > 0 && volumeRatio > PRICE_VOLUME_MATCH_RISE) 
+                || (changePercent < 0 && volumeRatio < PRICE_VOLUME_MATCH_FALL);
             current.setIsPriceVolumeMatch(match);
         }
     }
@@ -403,8 +413,8 @@ public class KLineAnalysisService {
         // 判断超买超卖
         Double rsi6 = current.getRsi6();
         if (rsi6 != null) {
-            current.setIsOverbought(rsi6 > 80);
-            current.setIsOversold(rsi6 < 20);
+            current.setIsOverbought(rsi6 > RSI_OVERBOUGHT);
+            current.setIsOversold(rsi6 < RSI_OVERSOLD);
         }
     }
     
@@ -450,32 +460,29 @@ public class KLineAnalysisService {
      * 下轨 = 中轨 - K × N日标准差
      */
     private void calculateBOLL(StockHistory current, List<StockHistory> historyList) {
-        int period = 20; // 布林带周期通常为20日
-        double k = 2.0;   // 标准差倍数
-        
-        if (historyList == null || historyList.size() < period) {
+        if (historyList == null || historyList.size() < BOLL_PERIOD) {
             return;
         }
         
         // 计算中轨(20日均线)
         double sum = 0;
-        for (int i = 0; i < period; i++) {
+        for (int i = 0; i < BOLL_PERIOD; i++) {
             sum += historyList.get(i).getClose();
         }
-        double middle = sum / period;
+        double middle = sum / BOLL_PERIOD;
         current.setBollMiddle(middle);
         
         // 计算标准差
         double variance = 0;
-        for (int i = 0; i < period; i++) {
+        for (int i = 0; i < BOLL_PERIOD; i++) {
             double diff = historyList.get(i).getClose() - middle;
             variance += diff * diff;
         }
-        double stdDev = Math.sqrt(variance / period);
+        double stdDev = Math.sqrt(variance / BOLL_PERIOD);
         
         // 计算上下轨
-        double upper = middle + k * stdDev;
-        double lower = middle - k * stdDev;
+        double upper = middle + BOLL_STD_MULTIPLIER * stdDev;
+        double lower = middle - BOLL_STD_MULTIPLIER * stdDev;
         
         current.setBollUpper(upper);
         current.setBollLower(lower);

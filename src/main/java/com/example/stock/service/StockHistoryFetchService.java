@@ -8,8 +8,7 @@ import com.example.stock.repository.StockSyncLogRepository;
 import com.example.stock.service.client.SinaStockClient;
 import com.example.stock.service.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -23,10 +22,10 @@ import java.util.Map;
  * 股票历史数据获取服务类
  * 提供股票历史数据的获取和保存功能
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockHistoryFetchService {
-    private static final Logger logger = LoggerFactory.getLogger(StockHistoryFetchService.class);
     private final SinaStockClient stockClient;
     private final StockHistoryRepository stockHistoryRepository;
     private final StockSyncLogRepository stockSyncLogRepository;
@@ -52,7 +51,7 @@ public class StockHistoryFetchService {
      * 注：中小板已于2020年与主板合并，不存在100开头的股票
      */
     public void fetchAllStockHistory() {
-        logger.info("开始批量获取所有A股股票历史数据...");
+        log.info("开始批量获取所有A股股票历史数据...");
 
         // 一次性获取所有同步日志，避免重复查询数据库
         List<StockSyncLog> syncLogs = stockSyncLogRepository.findAll();
@@ -62,37 +61,37 @@ public class StockHistoryFetchService {
         }
 
         // 沪市主板 (600-605)
-        logger.info("正在获取沪市主板股票数据 (600-605)...");
+        log.info("正在获取沪市主板股票数据 (600-605)...");
         for (int code = 600000; code <= 605999; code++) {
             processStock(code, syncLogMap);
         }
 
         // 沪市新增号段 (607-609)
-        logger.info("正在获取沪市新增号段股票数据 (607-609)...");
+        log.info("正在获取沪市新增号段股票数据 (607-609)...");
         for (int code = 607000; code <= 609999; code++) {
             processStock(code, syncLogMap);
         }
 
         // 沪市科创板 (688)
-        logger.info("正在获取沪市科创板股票数据 (688)...");
+        log.info("正在获取沪市科创板股票数据 (688)...");
         for (int code = 688000; code <= 688999; code++) {
             processStock(code, syncLogMap);
         }
 
         // 深市主板 (000-003)
-        logger.info("正在获取深市主板股票数据 (000-003)...");
+        log.info("正在获取深市主板股票数据 (000-003)...");
         for (int code = 1; code <= 3999; code++) {
             processStock(code, syncLogMap);
         }
 
         // 深市创业板 (300)
-        logger.info("正在获取深市创业板股票数据 (300)...");
+        log.info("正在获取深市创业板股票数据 (300)...");
         for (int code = 300000; code <= 399999; code++) {
             processStock(code, syncLogMap);
         }
 
 
-        logger.info("✅ 所有A股股票历史数据获取完成");
+        log.info("✅ 所有A股股票历史数据获取完成");
     }
 
     /**
@@ -115,10 +114,10 @@ public class StockHistoryFetchService {
                     // 如果同步日期是周末，说明上次运行时已经获取了最新的交易日数据，可以跳过
                     // 如果同步日期是今天，也可以跳过
                     if (isWeekend(nowDate) || syncDate.equals(nowDate)) {
-                        logger.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
+                        log.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
                         return;
                     }
-                    logger.debug("股票已同步过（同步日期: {}）: symbol={}", syncDate, symbol);
+                    log.debug("股票已同步过（同步日期: {}）: symbol={}", syncDate, symbol);
                 }
 
                 int insertedCount = fetchAndSaveHistory(symbol);
@@ -141,17 +140,17 @@ public class StockHistoryFetchService {
 
                 if (insertedCount > 0) {
                     try {
-                        logger.info("成功插入{}条新记录，执行延时", insertedCount);
+                        log.info("成功插入{}条新记录，执行延时", insertedCount);
                         Thread.sleep(3000 + insertedCount * 5L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
-                        logger.warn("延时被中断", e);
+                        log.warn("延时被中断", e);
                     }
                 }
             } catch (org.springframework.dao.DataAccessResourceFailureException e) {
-                logger.error("数据库连接异常，跳过该股票: symbol={}, 错误: {}", symbol, e.getMessage());
+                log.error("数据库连接异常，跳过该股票: symbol={}, 错误: {}", symbol, e.getMessage());
             } catch (Exception e) {
-                logger.error("处理股票时发生异常: symbol={}, 错误: {}", symbol, e.getMessage(), e);
+                log.error("处理股票时发生异常: symbol={}, 错误: {}", symbol, e.getMessage(), e);
             }
         }
     }
@@ -164,11 +163,11 @@ public class StockHistoryFetchService {
      */
     public int fetchAndSaveHistory(String symbol) {
         if (!StringUtils.hasText(symbol)) {
-            logger.error("Symbol不能为空");
+            log.error("Symbol不能为空");
             return 0;
         }
 
-        logger.info("开始获取股票历史数据: symbol={}", symbol);
+        log.info("开始获取股票历史数据: symbol={}", symbol);
         long totalStartTime = System.currentTimeMillis();
 
         // 1. 查询数据库中此股票的最新记录日期，判断是增量还是全量同步
@@ -184,7 +183,7 @@ public class StockHistoryFetchService {
             LocalDate lastTradingDay = getLastTradingDay(today);
             // 只有当数据库最新记录就是最近的交易日时，才跳过API调用
             if (latestDbDate.equals(lastTradingDay)) {
-                logger.info("✅ 数据库中最新记录已是最近的交易日({})，无需调用API，直接跳过", latestDbDate);
+                log.info("✅ 数据库中最新记录已是最近的交易日({})，无需调用API，直接跳过", latestDbDate);
                 return 0;
             }
         }
@@ -198,20 +197,20 @@ public class StockHistoryFetchService {
             LocalDate fromDate = latestDbDate.minusDays(daysAhead);
             long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(fromDate, LocalDate.now());
             datalen = (int) Math.min(daysBetween + 10, 70000); // 确保足够大，但不超过上限
-            logger.info("数据库中最新记录: {}, 将从{}开始处理，仅获取{}天的数据",
+            log.info("数据库中最新记录: {}, 将从{}开始处理，仅获取{}天的数据",
                     latestDbDate, fromDate, datalen);
         } else {
-            logger.info("数据库中无此股票数据，将推出全量获取");
+            log.info("数据库中无此股票数据，将推出全量获取");
         }
 
         // 2. 获取数据阶段
         long fetchStartTime = System.currentTimeMillis();
         List<StockHistoryDTO> historyList = stockClient.getStockHistory(symbol, datalen);
         long fetchDuration = System.currentTimeMillis() - fetchStartTime;
-        logger.info("⏱️ 获取数据耗时: {}ms, symbol={}", fetchDuration, symbol);
+        log.info("⏱️ 获取数据耗时: {}ms, symbol={}", fetchDuration, symbol);
 
         if (historyList == null || historyList.isEmpty()) {
-            logger.info("未获取到股票历史数据: symbol={}", symbol);
+            log.info("未获取到股票历史数据: symbol={}", symbol);
             return 0;
         }
 
@@ -219,13 +218,13 @@ public class StockHistoryFetchService {
         long mapStartTime = System.currentTimeMillis();
         List<StockHistory> entities = stockMapper.toStockHistoryList(historyList);
         long mapDuration = System.currentTimeMillis() - mapStartTime;
-        logger.info("⏱️ 数据转换耗时: {}ms, 记录数={}", mapDuration, entities.size());
+        log.info("⏱️ 数据转换耗时: {}ms, 记录数={}", mapDuration, entities.size());
 
         // 4. 数据排序阶段：按日期降序排列（最新到最旧），确保K线分析能正确获取前一天数据
         long sortStartTime = System.currentTimeMillis();
         entities.sort((a, b) -> b.getDay().compareTo(a.getDay()));
         long sortDuration = System.currentTimeMillis() - sortStartTime;
-        logger.info("⏱️ 数据排序完成，按日期降序排列，耗时: {}ms", sortDuration);
+        log.info("⏱️ 数据排序完成，按日期降序排列，耗时: {}ms", sortDuration);
 
         // 5. 关键优化：过滤出数据库中已经存在的记录，只保留新记录
         long filterStartTime = System.currentTimeMillis();
@@ -239,12 +238,12 @@ public class StockHistoryFetchService {
             }
         }
         long filterDuration = System.currentTimeMillis() - filterStartTime;
-        logger.info("⏱️ 过滤新记录耗时: {}ms, 原数据={}, 新记录数={}",
+        log.info("⏱️ 过滤新记录耗时: {}ms, 原数据={}, 新记录数={}",
                 filterDuration, entities.size(), newRecords.size());
 
         // 如果没有新记录，不需要执行后续处理
         if (newRecords.isEmpty()) {
-            logger.info("✅ symbol={}的数据已是最新，没有新记录需要写入", symbol);
+            log.info("✅ symbol={}的数据已是最新，没有新记录需要写入", symbol);
             return 0;
         }
 
@@ -262,16 +261,16 @@ public class StockHistoryFetchService {
             kLineAnalysisService.analyzeKLine(current, previous, entities);
         }
         long analysisDuration = System.currentTimeMillis() - analysisStartTime;
-        logger.info("⏱️ K线分析耗时: {}ms, 记录数={}", analysisDuration, newRecords.size());
+        log.info("⏱️ K线分析耗时: {}ms, 记录数={}", analysisDuration, newRecords.size());
 
         // 7. 批量插入阶段（仅插入新记录）
         long insertStartTime = System.currentTimeMillis();
         int[] result = stockHistoryRepository.batchInsertStockHistory(newRecords);
         long insertDuration = System.currentTimeMillis() - insertStartTime;
-        logger.info("⏱️ 批量插入耗时: {}ms, 记录数={}", insertDuration, result.length);
+        log.info("⏱️ 批量插入耗时: {}ms, 记录数={}", insertDuration, result.length);
 
         long totalDuration = System.currentTimeMillis() - totalStartTime;
-        logger.info("✅ 成功保存股票历史数据: symbol={}, 新增数据数={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 过滤:{}ms, 分析:{}ms, 插入:{}ms)",
+        log.info("✅ 成功保存股票历史数据: symbol={}, 新增数据数={}, 总耗时={}ms (获取:{}ms, 转换:{}ms, 过滤:{}ms, 分析:{}ms, 插入:{}ms)",
                 symbol, result.length, totalDuration, fetchDuration, mapDuration, filterDuration, analysisDuration, insertDuration);
 
         return result.length;  // 返回实际插入的记录数
@@ -286,8 +285,7 @@ public class StockHistoryFetchService {
      */
     private String generateSymbol(int code) {
         String paddedCode = String.format("%06d", code);
-        String twoDigitPrefix = paddedCode.substring(0, 2);
-        int prefixValue = Integer.parseInt(twoDigitPrefix);
+        int prefixValue = Integer.parseInt(paddedCode.substring(0, 3));
 
         // 沪市 (A股) - 60开头、607-609、688
         if (paddedCode.startsWith("60") || paddedCode.startsWith("688")) {
@@ -297,8 +295,8 @@ public class StockHistoryFetchService {
         else if (prefixValue >= 607 && prefixValue <= 609) {
             return "sh" + paddedCode;
         }
-        // 深市 (A股) - 000-003 (主板) 或 300 (创业板)
-        else if ((prefixValue >= 0 && prefixValue <= 3) || prefixValue == 300) {
+        // 深市 (A股) - 000-003 (主板) 或 300-399 (创业板)
+        else if ((prefixValue >= 0 && prefixValue <= 3) || (prefixValue >= 300 && prefixValue <= 399)) {
             return "sz" + paddedCode;
         }
         else {

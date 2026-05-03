@@ -2,8 +2,7 @@ package com.example.stock.scheduler;
 
 import com.example.stock.service.StockDataFetchService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,10 +13,10 @@ import java.time.LocalDateTime;
  * 股票数据同步定时任务调度器
  * 负责定时触发股票实时数据的同步任务
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StockDataSyncScheduler {
-    private static final Logger logger = LoggerFactory.getLogger(StockDataSyncScheduler.class);
     private final StockDataFetchService dataFetchService;
     private final TaskExecutor syncTaskExecutor;
 
@@ -28,9 +27,9 @@ public class StockDataSyncScheduler {
     @Scheduled(cron = "0 39 7 * * ?")
     public void syncStockData() {
         syncTaskExecutor.execute(() -> {
-            logger.info("开始同步股票实时数据，时间：{}", LocalDateTime.now());
-            //int count = dataFetchService.fetchAndSaveStockData();
-            //logger.info("股票实时数据同步完成，同步记录数：{}", count);
+            log.info("开始同步股票实时数据，时间：{}", LocalDateTime.now());
+            int count = dataFetchService.fetchAndSaveStockData();
+            log.info("股票实时数据同步完成，同步记录数：{}", count);
         });
     }
 }

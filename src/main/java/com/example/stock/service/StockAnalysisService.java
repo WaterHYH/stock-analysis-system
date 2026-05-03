@@ -5,10 +5,8 @@ import com.example.stock.entity.Stock;
 import com.example.stock.entity.StockHistory;
 import com.example.stock.repository.StockHistoryRepository;
 import com.example.stock.repository.StockRepository;
-import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,16 +17,32 @@ import java.util.stream.Collectors;
  * 股票分析服务类
  * 提供各种股票筛选条件的实现
  */
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class StockAnalysisService {
 
-    private static final Logger logger = LoggerFactory.getLogger(StockAnalysisService.class);
+    private final StockHistoryRepository stockHistoryRepository;
 
-    @Autowired
-    private StockHistoryRepository stockHistoryRepository;
+    private final StockRepository stockRepository;
 
-    @Autowired
-    private StockRepository stockRepository;
+    private static final double LOW_PRICE_RATIO_THRESHOLD = 0.4;
+    private static final double NEAR_YEAR_HIGH_PCT = 5.0;
+    private static final double VOLUME_SURGE_MULTIPLIER = 2.0;
+
+    /**
+     * 批量获取所有股票的历史数据并按symbol分组
+     * 避免N+1查询问题
+     */
+    private Map<String, List<StockHistory>> fetchAllHistoriesGroupedBySymbol() {
+        List<String> allSymbols = stockHistoryRepository.findAllSymbols();
+        if (allSymbols.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<StockHistory> allHistories = stockHistoryRepository.findBySymbolInOrderBySymbolAscDayDesc(allSymbols);
+        return allHistories.stream()
+                .collect(Collectors.groupingBy(StockHistory::getSymbol));
+    }
 
     /**
      * 根据多个条件分析股票
@@ -48,12 +62,12 @@ public class StockAnalysisService {
      */
     public List<StockAnalysisDTO> analyzeStocks(List<String> conditions, LocalDate startDate, Double dropPercentage) {
         long startTime = System.currentTimeMillis();
-        logger.info("开始根据条件分析股票: {}, startDate: {}, dropPercentage: {}", conditions, startDate, dropPercentage);
+        log.info("开始根据条件分析股票: {}, startDate: {}, dropPercentage: {}", conditions, startDate, dropPercentage);
         
         List<StockAnalysisDTO> allResults = new ArrayList<>();
         
         if (conditions == null || conditions.isEmpty()) {
-            logger.info("条件列表为空，返回空结果");
+            log.info("条件列表为空，返回空结果");
             return allResults;
         }
         
@@ -94,7 +108,7 @@ public class StockAnalysisService {
         }
         
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("条件分析完成，共找到 {} 只符合条件的股票，总耗时 {}ms", allResults.size(), totalTime);
+        log.info("条件分析完成，共找到 {} 只符合条件的股票，总耗时 {}ms", allResults.size(), totalTime);
         
         return allResults;
     }
@@ -106,7 +120,7 @@ public class StockAnalysisService {
      */
     public List<StockAnalysisDTO> getAllAnalysisResults() {
         long startTime = System.currentTimeMillis();
-        logger.info("开始执行所有股票筛选条件");
+        log.info("开始执行所有股票筛选条件");
 
         List<StockAnalysisDTO> allResults = new ArrayList<>();
 
@@ -129,7 +143,7 @@ public class StockAnalysisService {
         allResults.addAll(findGoldenCrossStocks());
 
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("所有筛选条件执行完成，共找到 {} 只符合条件的股票，总耗时 {}ms", allResults.size(), totalTime);
+        log.info("所有筛选条件执行完成，共找到 {} 只符合条件的股票，总耗时 {}ms", allResults.size(), totalTime);
 
         return allResults;
     }
@@ -150,7 +164,7 @@ public class StockAnalysisService {
     public List<StockAnalysisDTO> findStocksBelowHistoricalHighWithParams(LocalDate startDate, Double dropPercentage) {
         long startTime = System.currentTimeMillis();
         double actualDropPercentage = dropPercentage != null ? dropPercentage : 25.0;
-        logger.info("开始筛选跌幅超过{}%的股票，开始日期: {}", actualDropPercentage, startDate);
+        log.info("开始筛选跌幅超过{}%的股票，开始日期: {}", actualDropPercentage, startDate);
 
         try {
             // 使用数据库聚合查询一次性找出所有符合条件的股票
@@ -167,7 +181,7 @@ public class StockAnalysisService {
             }
             
             long queryTime = System.currentTimeMillis() - queryStart;
-            logger.info("数据库查询完成，找到{}条符合条件的记录，耗时{}ms", queryResults.size(), queryTime);
+            log.info("数据库查询完成，找到{}条符合条件的记录，耗时{}ms", queryResults.size(), queryTime);
 
             List<StockAnalysisDTO> results = queryResults.stream().map(row -> {
                 String symbol = (String) row.get("symbol");
@@ -186,11 +200,11 @@ public class StockAnalysisService {
             }).collect(Collectors.toList());
 
             long totalTime = System.currentTimeMillis() - startTime;
-            logger.info("找到 {} 只符合条件的股票，总耗时{}ms（数据库查询{}ms）",
+            log.info("找到 {} 只符合条件的股票，总耗时{}ms（数据库查询{}ms）",
                     results.size(), totalTime, queryTime);
             return results;
         } catch (Exception e) {
-            logger.error("数据库查询失败，使用应用层事后查询: {}", e.getMessage());
+            log.error("数据库查询失败，使用应用层事后查询: {}", e.getMessage());
             return findStocksBelowHistoricalHighFallback(startDate, actualDropPercentage);
         }
     }
@@ -199,62 +213,45 @@ public class StockAnalysisService {
      * 回退方案：当数据库查询失败时使用
      */
     private List<StockAnalysisDTO> findStocksBelowHistoricalHighFallback(LocalDate startDate, double dropPercentage) {
-        logger.info("使用回退方案：应用层查询模式，跌幅阈值: {}%，开始日期: {}", dropPercentage, startDate);
+        log.info("使用回退方案：应用层查询模式，跌幅阈值: {}%，开始日期: {}", dropPercentage, startDate);
         List<StockAnalysisDTO> results = new ArrayList<>();
-        int batchSize = 1000;
 
-        // 获取所有股票代码并分批处理
-        // 优化：不使用全表扫描，而是通过查询获取所有股票代码
-        List<String> allStocks = stockHistoryRepository.findAllSymbols();
+        Map<String, List<StockHistory>> groupedHistories = fetchAllHistoriesGroupedBySymbol();
 
-        for (int i = 0; i < allStocks.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, allStocks.size());
-            List<String> batchSymbols = allStocks.subList(i, end);
+        for (Map.Entry<String, List<StockHistory>> entry : groupedHistories.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
 
-            for (String symbol : batchSymbols) {
-                List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
-
-                // 根据开始日期过滤数据
-                if (startDate != null) {
-                    histories = histories.stream()
-                            .filter(h -> !h.getDay().isBefore(startDate))
-                            .collect(Collectors.toList());
-                }
-
-                if (!histories.isEmpty()) {
-                    double maxHigh = histories.stream()
-                            .mapToDouble(StockHistory::getHigh)
-                            .max()
-                            .orElse(0);
-
-                    StockHistory latest = histories.stream()
-                            .max(Comparator.comparing(StockHistory::getDay))
-                            .orElse(null);
-
-                    if (latest != null) {
-                        double currentPrice = latest.getClose();
-                        double actualDropPercentage = ((maxHigh - currentPrice) / maxHigh) * 100;
-
-                        if (actualDropPercentage >= dropPercentage) {
-                            results.add(StockAnalysisDTO.builder()
-                                    .symbol(symbol)
-                                    .currentPrice(currentPrice)
-                                    .historicalHigh(maxHigh)
-                                    .dropPercentage(actualDropPercentage)
-                                    .matchedCondition("低于历史最高值" + String.format("%.1f", dropPercentage) + "%以上")
-                                    .build());
-                        }
-                    }
-                }
+            if (startDate != null) {
+                histories = histories.stream()
+                        .filter(h -> !h.getDay().isBefore(startDate))
+                        .collect(Collectors.toList());
             }
 
-            if ((i + batchSize) % 500 == 0) {
-                logger.info("处理进度: {}/{}, 已找到{}只符合条件的股票",
-                        Math.min(i + batchSize, allStocks.size()), allStocks.size(), results.size());
+            if (!histories.isEmpty()) {
+                double maxHigh = histories.stream()
+                        .mapToDouble(StockHistory::getHigh)
+                        .max()
+                        .orElse(0);
+
+                StockHistory latest = histories.get(0);
+
+                double currentPrice = latest.getClose();
+                double actualDropPercentage = ((maxHigh - currentPrice) / maxHigh) * 100;
+
+                if (actualDropPercentage >= dropPercentage) {
+                    results.add(StockAnalysisDTO.builder()
+                            .symbol(symbol)
+                            .currentPrice(currentPrice)
+                            .historicalHigh(maxHigh)
+                            .dropPercentage(actualDropPercentage)
+                            .matchedCondition("低于历史最高值" + String.format("%.1f", dropPercentage) + "%以上")
+                            .build());
+                }
             }
         }
 
-        logger.info("回退方案完成，找到 {} 只符合条件的股票", results.size());
+        log.info("回退方案完成，找到 {} 只符合条件的股票", results.size());
         return results;
     }
 
@@ -263,26 +260,22 @@ public class StockAnalysisService {
      */
     private List<StockAnalysisDTO> findHighVolatilityLowPriceStocks() {
         long startTime = System.currentTimeMillis();
-        logger.info("开始筛选高波动低价位股票");
+        log.info("开始筛选高波动低价位股票");
         List<StockAnalysisDTO> results = new ArrayList<>();
         LocalDate halfYearAgo = LocalDate.now().minusMonths(6);
 
-        // 获取所有股票代码
-        // 优化：不使用全表扫描，而是通过查询获取所有股票代码
-        List<String> allSymbols = stockHistoryRepository.findAllSymbols();
+        Map<String, List<StockHistory>> groupedHistories = fetchAllHistoriesGroupedBySymbol();
 
-        for (String symbol : allSymbols) {
-            List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
+        for (Map.Entry<String, List<StockHistory>> entry : groupedHistories.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
 
-            // 筛选最近半年的数据
             List<StockHistory> recentHistories = histories.stream()
                     .filter(h -> h.getDay().isAfter(halfYearAgo))
-                    .sorted(Comparator.comparing(StockHistory::getDay))
                     .collect(Collectors.toList());
 
-            if (recentHistories.size() < 30) continue; // 至少需要30天数据
+            if (recentHistories.size() < 30) continue;
 
-            // 统计波动次数（日内波动超过20%）
             int volatilityCount = 0;
             for (StockHistory history : recentHistories) {
                 double dayRange = ((history.getHigh() - history.getLow()) / history.getLow()) * 100;
@@ -292,7 +285,7 @@ public class StockAnalysisService {
             }
 
             if (volatilityCount >= 3) {
-                StockHistory latest = recentHistories.get(recentHistories.size() - 1);
+                StockHistory latest = recentHistories.get(0);
                 double recentHigh = recentHistories.stream()
                         .mapToDouble(StockHistory::getHigh)
                         .max()
@@ -302,9 +295,8 @@ public class StockAnalysisService {
                         .min()
                         .orElse(0);
 
-                // 判断当前价格是否处于低位（低于区间的40%位置）
                 double currentPrice = latest.getClose();
-                double lowThreshold = recentLow + (recentHigh - recentLow) * 0.4;
+                double lowThreshold = recentLow + (recentHigh - recentLow) * LOW_PRICE_RATIO_THRESHOLD;
 
                 if (currentPrice <= lowThreshold) {
                     results.add(StockAnalysisDTO.builder()
@@ -320,7 +312,7 @@ public class StockAnalysisService {
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
+        log.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
         return results;
     }
 
@@ -329,25 +321,21 @@ public class StockAnalysisService {
      */
     private List<StockAnalysisDTO> findContinuousRiseStocks() {
         long startTime = System.currentTimeMillis();
-        logger.info("开始筛选连续上涨趋势股票");
+        log.info("开始筛选连续上涨趋势股票");
         List<StockAnalysisDTO> results = new ArrayList<>();
 
-        // 获取所有股票代码
-        // 优化：不使用全表扫描，而是通过查询获取所有股票代码
-        List<String> allSymbols = stockHistoryRepository.findAllSymbols();
+        Map<String, List<StockHistory>> groupedHistories = fetchAllHistoriesGroupedBySymbol();
 
-        for (String symbol : allSymbols) {
-            List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
+        for (Map.Entry<String, List<StockHistory>> entry : groupedHistories.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
 
-            // 获取最近10个交易日
             List<StockHistory> recent10Days = histories.stream()
-                    .sorted(Comparator.comparing(StockHistory::getDay).reversed())
                     .limit(10)
                     .collect(Collectors.toList());
 
             if (recent10Days.size() < 10) continue;
 
-            // 统计上涨天数
             long riseDays = recent10Days.stream()
                     .filter(h -> h.getClose() > h.getOpen())
                     .count();
@@ -363,7 +351,7 @@ public class StockAnalysisService {
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
+        log.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
         return results;
     }
 
@@ -372,18 +360,16 @@ public class StockAnalysisService {
      */
     private List<StockAnalysisDTO> findNearYearHighStocks() {
         long startTime = System.currentTimeMillis();
-        logger.info("开始筛选接近年度最高点的股票");
+        log.info("开始筛选接近年度最高点的股票");
         List<StockAnalysisDTO> results = new ArrayList<>();
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
 
-        // 获取所有股票代码
-        // 优化：不使用全表扫描，而是通过查询获取所有股票代码
-        List<String> allSymbols = stockHistoryRepository.findAllSymbols();
+        Map<String, List<StockHistory>> groupedHistories = fetchAllHistoriesGroupedBySymbol();
 
-        for (String symbol : allSymbols) {
-            List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
+        for (Map.Entry<String, List<StockHistory>> entry : groupedHistories.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
 
-            // 筛选最近一年的数据
             List<StockHistory> yearHistories = histories.stream()
                     .filter(h -> h.getDay().isAfter(oneYearAgo))
                     .collect(Collectors.toList());
@@ -395,16 +381,14 @@ public class StockAnalysisService {
                     .max()
                     .orElse(0);
 
-            StockHistory latest = yearHistories.stream()
-                    .max(Comparator.comparing(StockHistory::getDay))
-                    .orElse(null);
+            StockHistory latest = yearHistories.get(0);
 
-            if (latest == null || yearHigh == 0) continue;
+            if (yearHigh == 0) continue;
 
             double currentPrice = latest.getClose();
             double difference = ((yearHigh - currentPrice) / yearHigh) * 100;
 
-            if (difference <= 5 && difference >= 0) {
+            if (difference <= NEAR_YEAR_HIGH_PCT && difference >= 0) {
                 results.add(StockAnalysisDTO.builder()
                         .symbol(symbol)
                         .currentPrice(currentPrice)
@@ -416,7 +400,7 @@ public class StockAnalysisService {
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
+        log.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
         return results;
     }
 
@@ -425,19 +409,16 @@ public class StockAnalysisService {
      */
     private List<StockAnalysisDTO> findVolumeSurgeStocks() {
         long startTime = System.currentTimeMillis();
-        logger.info("开始筛选成交量激增股票");
+        log.info("开始筛选成交量激增股票");
         List<StockAnalysisDTO> results = new ArrayList<>();
 
-        // 获取所有股票代码
-        // 优化：不使用全表扫描，而是通过查询获取所有股票代码
-        List<String> allSymbols = stockHistoryRepository.findAllSymbols();
+        Map<String, List<StockHistory>> groupedHistories = fetchAllHistoriesGroupedBySymbol();
 
-        for (String symbol : allSymbols) {
-            List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
+        for (Map.Entry<String, List<StockHistory>> entry : groupedHistories.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
 
-            // 获取最近31个交易日
             List<StockHistory> recent31Days = histories.stream()
-                    .sorted(Comparator.comparing(StockHistory::getDay).reversed())
                     .limit(31)
                     .collect(Collectors.toList());
 
@@ -446,14 +427,13 @@ public class StockAnalysisService {
             StockHistory latest = recent31Days.get(0);
             long latestVolume = latest.getVolume();
 
-            // 计算前30天平均成交量
             double avgVolume = recent31Days.stream()
                     .skip(1)
                     .mapToLong(StockHistory::getVolume)
                     .average()
                     .orElse(0);
 
-            if (avgVolume > 0 && latestVolume > avgVolume * 2) {
+            if (avgVolume > 0 && latestVolume > avgVolume * VOLUME_SURGE_MULTIPLIER) {
                 results.add(StockAnalysisDTO.builder()
                         .symbol(symbol)
                         .currentPrice(latest.getClose())
@@ -463,7 +443,7 @@ public class StockAnalysisService {
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
+        log.info("找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
         return results;
     }
 
@@ -488,7 +468,7 @@ public class StockAnalysisService {
      */
     private List<StockAnalysisDTO> findGoldenCrossStocksOriginal() {
         long startTime = System.currentTimeMillis();
-        logger.info("开始筛选均线金叉股票（原始方案）");
+        log.info("开始筛选均线金叉股票（原始方案）");
         List<StockAnalysisDTO> results = new ArrayList<>();
 
         try {
@@ -496,7 +476,7 @@ public class StockAnalysisService {
             long queryStart = System.currentTimeMillis();
             List<Map<String, Object>> queryResults = stockHistoryRepository.findGoldenCrossStocksOptimized();
             long queryTime = System.currentTimeMillis() - queryStart;
-            logger.info("数据库查询完成，找到{}条符合条件的记录，耗时{}ms", queryResults.size(), queryTime);
+            log.info("数据库查询完成，找到{}条符合条件的记录，耗时{}ms", queryResults.size(), queryTime);
 
             for (Map<String, Object> row : queryResults) {
                 String symbol = (String) row.get("symbol");
@@ -510,11 +490,11 @@ public class StockAnalysisService {
             }
 
             long totalTime = System.currentTimeMillis() - startTime;
-            logger.info("找到 {} 只符合条件的股票，总耗时{}ms（数据库查询{}ms）",
+            log.info("找到 {} 只符合条件的股票，总耗时{}ms（数据库查询{}ms）",
                     results.size(), totalTime, queryTime);
             return results;
         } catch (Exception e) {
-            logger.error("数据库查询失败: {}", e.getMessage());
+            log.error("数据库查询失败: {}", e.getMessage());
             return results; // 返回空列表
         }
     }
@@ -528,18 +508,18 @@ public class StockAnalysisService {
         // 查询前一个交易日
         LocalDate previousDate = stockHistoryRepository.findPreviousTradeDate(latestDate);
         if (previousDate == null) {
-            logger.warn("找不到{}之前的交易日期", latestDate);
+            log.warn("找不到{}之前的交易日期", latestDate);
             return Collections.emptyList();
         }
         
         long startTime = System.currentTimeMillis();
-        logger.info("开始筛选均线金叉股票，最新日期: {}, 前一交易日: {}", latestDate, previousDate);
+        log.info("开始筛选均线金叉股票，最新日期: {}, 前一交易日: {}", latestDate, previousDate);
         
         // 获取最近两个交易日的所有股票数据
         long queryStart = System.currentTimeMillis();
         List<StockHistory> latestTwoDaysData = stockHistoryRepository.findLatestTwoDaysData(latestDate, previousDate);
         long queryTime = System.currentTimeMillis() - queryStart;
-        logger.info("获取最近两个交易日数据完成，共{}条记录，耗时{}ms", latestTwoDaysData.size(), queryTime);
+        log.info("获取最近两个交易日数据完成，共{}条记录，耗时{}ms", latestTwoDaysData.size(), queryTime);
 
         // 按股票代码分组
         Map<String, List<StockHistory>> groupedBySymbol = latestTwoDaysData.stream()
@@ -588,7 +568,7 @@ public class StockAnalysisService {
         }
         
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.info("金叉分析完成，找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
+        log.info("金叉分析完成，找到 {} 只符合条件的股票，总耗时{}ms", results.size(), totalTime);
         return results;
     }
 
@@ -596,18 +576,16 @@ public class StockAnalysisService {
      * 回退方案：当数据库查询失败时使用
      */
     private List<StockAnalysisDTO> findGoldenCrossStocksFallback() {
-        logger.info("使用回退方案：应用层查询模式");
+        log.info("使用回退方案：应用层查询模式");
         List<StockAnalysisDTO> results = new ArrayList<>();
 
-        // 优化：不使用全表扫描，而是通过查询获取所有股票代码
-        List<String> allSymbols = stockHistoryRepository.findAllSymbols();
+        Map<String, List<StockHistory>> groupedHistories = fetchAllHistoriesGroupedBySymbol();
 
-        for (String symbol : allSymbols) {
-            List<StockHistory> histories = stockHistoryRepository.findBySymbol(symbol);
+        for (Map.Entry<String, List<StockHistory>> entry : groupedHistories.entrySet()) {
+            String symbol = entry.getKey();
+            List<StockHistory> histories = entry.getValue();
 
-            // 获取最近2个交易日
             List<StockHistory> recent2Days = histories.stream()
-                    .sorted(Comparator.comparing(StockHistory::getDay).reversed())
                     .limit(2)
                     .collect(Collectors.toList());
 
@@ -616,7 +594,6 @@ public class StockAnalysisService {
             StockHistory today = recent2Days.get(0);
             StockHistory yesterday = recent2Days.get(1);
 
-            // 判断金叉：昨天5日均线<=10日均线，今天5日均线>10日均线
             if (yesterday.getMaPrice5() <= yesterday.getMaPrice10() &&
                 today.getMaPrice5() > today.getMaPrice10()) {
 
@@ -628,7 +605,7 @@ public class StockAnalysisService {
             }
         }
 
-        logger.info("回退方案完成，找到 {} 只符合条件的股票", results.size());
+        log.info("回退方案完成，找到 {} 只符合条件的股票", results.size());
         return results;
     }
 

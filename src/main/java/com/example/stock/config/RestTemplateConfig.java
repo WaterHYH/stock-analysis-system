@@ -35,15 +35,10 @@ public class RestTemplateConfig {
                 .setReadTimeout(Duration.ofSeconds(15))    // 读取超时：15秒
                 .build();
         
-        // 替换StringHttpMessageConverter以支持GBK编码
+        // 设置字符串消息转换器字符集为UTF-8
         restTemplate.getMessageConverters().stream()
                 .filter(converter -> converter instanceof StringHttpMessageConverter)
                 .forEach(converter -> ((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8));
-        
-        // 添加GBK支持的转换器
-        StringHttpMessageConverter gbkConverter = new StringHttpMessageConverter();
-        gbkConverter.setDefaultCharset(StandardCharsets.UTF_8);
-        restTemplate.getMessageConverters().add(0, gbkConverter);
         
         // 添加请求计时拦截器
         restTemplate.getInterceptors().add((request, body, execution) -> {
