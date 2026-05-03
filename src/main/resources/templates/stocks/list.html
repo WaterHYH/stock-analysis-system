@@ -134,6 +134,23 @@
             background: white;
             z-index: 1;
         }
+
+        .version-footer {
+            position: fixed;
+            bottom: 0;
+            right: 16px;
+            padding: 6px 14px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 4px 4px 0 0;
+            font-size: 12px;
+            color: #999;
+            z-index: 999;
+        }
+
+        .version-sep {
+            margin: 0 6px;
+            color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -325,6 +342,12 @@
     <span th:if="${!stocks.last}">
         <a th:href="@{/stocks(page=${stocks.totalPages - 1}, size=${stocks.size}, symbol=${symbol})}">末页</a>
     </span>
+</div>
+
+<div class="version-footer" th:if="${version != null}">
+    <span th:text="${version}">v1</span>
+    <span class="version-sep">|</span>
+    <span th:text="${commitId}">abc1234</span>
 </div>
 
 </body>

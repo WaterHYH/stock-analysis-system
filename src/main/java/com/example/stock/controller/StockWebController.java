@@ -1,8 +1,10 @@
 package com.example.stock.controller;
 
+import com.example.stock.config.VersionConfig;
 import com.example.stock.entity.Stock;
 import com.example.stock.service.StockQueryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
  * 股票Web页面控制器
  * 处理股票数据展示相关的页面请求
  */
+@Slf4j
 @Controller
 @RequestMapping("/stocks")
 @RequiredArgsConstructor
 public class StockWebController {
     private final StockQueryService stockQueryService;
+    private final VersionConfig versionConfig;
 
     /**
      * 股票列表页面
@@ -39,6 +43,8 @@ public class StockWebController {
         Page<Stock> stocks = stockQueryService.findStocks(symbol, page, size);
         model.addAttribute("stocks", stocks);
         model.addAttribute("symbol", symbol);
+        model.addAttribute("version", versionConfig.getVersion());
+        model.addAttribute("commitId", versionConfig.getCommitId());
         return "stocks/list";
     }
 }
