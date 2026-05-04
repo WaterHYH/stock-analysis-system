@@ -9,6 +9,7 @@
 3. **测试先于实现** — 写代码前先写测试（TDD）
 4. **验证先于完成** — 声称完成前必须运行验证命令
 5. **修改代码后必须重新运行项目** — 任何 .java/.html/.properties 等源码改动后，必须重新 mvn compile + spring-boot:run 验证项目能正常启动和运行
+6. **修改必须通过服务器验证才叫完成** — 本地运行成功后，必须 `mvn clean package -DskipTests` 打包，scp 推送到服务器 `root@120.76.43.179:/var/www/stock/app/`，远程重启并验证启动成功。如果服务器运行失败，必须继续修改直到服务器也运行成功。
 
 ## Skills 位置
 
@@ -43,3 +44,31 @@ mvn compile -q && mvn spring-boot:run
 ```powershell
 Invoke-WebRequest -Uri "http://localhost:8080/stocks" -UseBasicParsing -TimeoutSec 5
 ```
+
+### 服务器部署与验证
+
+本地运行成功后，必须推送到服务器验证：
+
+**1. 打包：**
+```powershell
+mvn clean package -DskipTests
+```
+
+**2. 上传到服务器：**
+```powershell
+scp target\demo-0.0.1-SNAPSHOT.jar root@120.76.43.179:/var/www/stock/app/
+```
+
+**3. 服务器重启：**
+```bash
+ssh root@120.76.43.179 "pkill -9 -f demo-0.0.1-SNAPSHOT.jar; sleep 3; nohup java -jar /var/www/stock/app/demo-0.0.1-SNAPSHOT.jar > /var/www/stock/app/app.log 2>&1 &"
+```
+
+**4. 验证服务器启动成功：**
+```bash
+ssh root@120.76.43.179 "sleep 5; tail -20 /var/www/stock/app/app.log"
+```
+
+检查日志中出现 `Started StockApplication` 且无 `APPLICATION FAILED TO START` 错误，则服务器运行成功。如果启动失败，根据错误日志继续修改代码。**
+
+
