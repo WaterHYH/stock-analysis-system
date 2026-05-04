@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 股票历史数据获取服务类
@@ -33,125 +34,108 @@ public class StockHistoryFetchService {
     private final KLineAnalysisService kLineAnalysisService;
     private final TaskExecutor syncTaskExecutor;
 
+    private static final long BATCH_THROTTLE_MS = 2000;
+
     /**
      * 批量获取所有A股股票历史数据
-     * 覆盖沪市（A股）、深市的所有股票代码
-     *
-     * 沪市（A股）:
-     *   - 600-605: 主板 (600000-605999)
-     *   - 607: 新增股票 (607000-607999)
-     *   - 608: 新增股票 (608000-608999)
-     *   - 609: 新增股票 (609000-609999)
-     *   - 688: 科创板 (688000-688999)
-     *
-     * 深市:
-     *   - 000-003: 主板 (000000-003999)
-     *   - 300: 创业板 (300000-300999)
-     *
-     * 注：中小板已于2020年与主板合并，不存在100开头的股票
      */
     public void fetchAllStockHistory() {
         log.info("开始批量获取所有A股股票历史数据...");
 
-        // 一次性获取所有同步日志，避免重复查询数据库
         List<StockSyncLog> syncLogs = stockSyncLogRepository.findAll();
         Map<String, StockSyncLog> syncLogMap = new HashMap<>();
         for (StockSyncLog log : syncLogs) {
             syncLogMap.put(log.getSymbol(), log);
         }
 
-        // 沪市主板 (600-605)
-        log.info("正在获取沪市主板股票数据 (600-605)...");
-        for (int code = 600000; code <= 605999; code++) {
-            processStock(code, syncLogMap);
+        AtomicInteger processed = new AtomicInteger(0);
+        AtomicInteger skipped = new AtomicInteger(0);
+
+        runStockBatch("沪市主板", 600000, 605999, "600-605", syncLogMap, processed, skipped);
+        runStockBatch("沪市新增号段", 607000, 609999, "607-609", syncLogMap, processed, skipped);
+        runStockBatch("沪市科创板", 688000, 688999, "688", syncLogMap, processed, skipped);
+        runStockBatch("深市主板", 1, 3999, "000-003", syncLogMap, processed, skipped);
+        runStockBatch("深市创业板", 300000, 399999, "300", syncLogMap, processed, skipped);
+
+        log.info("✅ 所有A股股票历史数据获取完成, 本次处理: {}只, 跳过: {}只", processed.get(), skipped.get());
+    }
+
+    private void runStockBatch(String name, int codeFrom, int codeTo, String codeRange,
+            Map<String, StockSyncLog> syncLogMap, AtomicInteger processed, AtomicInteger skipped) {
+        int batchSkipped = 0;
+        int batchProcessed = 0;
+
+        for (int code = codeFrom; code <= codeTo; code++) {
+            int result = processStock(code, syncLogMap);
+            if (result == 0) {
+                batchSkipped++;
+            } else if (result > 0) {
+                batchProcessed++;
+            }
+            // result < 0 means error, don't count
         }
 
-        // 沪市新增号段 (607-609)
-        log.info("正在获取沪市新增号段股票数据 (607-609)...");
-        for (int code = 607000; code <= 609999; code++) {
-            processStock(code, syncLogMap);
+        processed.addAndGet(batchProcessed);
+        skipped.addAndGet(batchSkipped);
+
+        log.info("{} ({}): 已跳过 {}只, 新处理 {}只, 总范围: {}", name, codeRange, batchSkipped, batchProcessed, codeTo - codeFrom + 1);
+
+        // 号段间限速：降低 CPU 和磁盘压力
+        try {
+            Thread.sleep(BATCH_THROTTLE_MS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-
-        // 沪市科创板 (688)
-        log.info("正在获取沪市科创板股票数据 (688)...");
-        for (int code = 688000; code <= 688999; code++) {
-            processStock(code, syncLogMap);
-        }
-
-        // 深市主板 (000-003)
-        log.info("正在获取深市主板股票数据 (000-003)...");
-        for (int code = 1; code <= 3999; code++) {
-            processStock(code, syncLogMap);
-        }
-
-        // 深市创业板 (300)
-        log.info("正在获取深市创业板股票数据 (300)...");
-        for (int code = 300000; code <= 399999; code++) {
-            processStock(code, syncLogMap);
-        }
-
-
-        log.info("✅ 所有A股股票历史数据获取完成");
     }
 
     /**
      * 处理单个股票代码
-     * 生成股票symbol并获取保存其历史数据
-     * 如果当天已经获取过则跳过
-     * @param code 股票代码
-     * @param syncLogMap 同步日志 Map (symbol -> StockSyncLog)
+     * @return 0=已跳过, >0=成功插入的记录数, -1=出错
      */
-    private void processStock(int code, Map<String, StockSyncLog> syncLogMap) {
+    private int processStock(int code, Map<String, StockSyncLog> syncLogMap) {
         String symbol = generateSymbol(code);
-        if (symbol != null) {
-            try {
-                // 检查字典中是否存在该股票的同步记录
-                if (syncLogMap.containsKey(symbol)) {
-                    StockSyncLog syncLog = syncLogMap.get(symbol);
-                    LocalDate syncDate = syncLog.getSyncDate();
-                    LocalDate nowDate = LocalDate.now();
-
-                    // 如果同步日期是周末，说明上次运行时已经获取了最新的交易日数据，可以跳过
-                    // 如果同步日期是今天，也可以跳过
-                    if (isWeekend(nowDate) || syncDate.equals(nowDate)) {
-                        log.debug("股票已同步过（同步日期: {}），跳过: symbol={}", syncDate, symbol);
-                        return;
-                    }
-                    log.debug("股票已同步过（同步日期: {}）: symbol={}", syncDate, symbol);
+        if (symbol == null) {
+            return 0;
+        }
+        try {
+            if (syncLogMap.containsKey(symbol)) {
+                StockSyncLog syncLog = syncLogMap.get(symbol);
+                LocalDate syncDate = syncLog.getSyncDate();
+                LocalDate nowDate = LocalDate.now();
+                if (isWeekend(nowDate) || syncDate.equals(nowDate)) {
+                    return 0;
                 }
-
-                int insertedCount = fetchAndSaveHistory(symbol);
-                // 对于同步日志的处理：
-                // 1. 字典中存在该股票 -> 更新sync_date
-                // 2. 字典中不存在 -> 创建新记录
-                if (syncLogMap.containsKey(symbol)) {
-                    // 更新现有记录
-                    StockSyncLog syncLog = syncLogMap.get(symbol);
-                    syncLog.setSyncDate(LocalDate.now());
-                    stockSyncLogRepository.save(syncLog);
-                } else {
-                    // 创建新记录
-                    StockSyncLog syncLog = new StockSyncLog();
-                    syncLog.setSymbol(symbol);
-                    syncLog.setSyncDate(LocalDate.now());
-                    stockSyncLogRepository.save(syncLog);
-                    syncLogMap.put(symbol, syncLog);
-                }
-
-                if (insertedCount > 0) {
-                    try {
-                        log.info("成功插入{}条新记录，执行延时", insertedCount);
-                        Thread.sleep(3000 + insertedCount * 5L);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        log.warn("延时被中断", e);
-                    }
-                }
-            } catch (org.springframework.dao.DataAccessResourceFailureException e) {
-                log.error("数据库连接异常，跳过该股票: symbol={}, 错误: {}", symbol, e.getMessage());
-            } catch (Exception e) {
-                log.error("处理股票时发生异常: symbol={}, 错误: {}", symbol, e.getMessage(), e);
             }
+
+            int insertedCount = fetchAndSaveHistory(symbol);
+            if (syncLogMap.containsKey(symbol)) {
+                StockSyncLog syncLog = syncLogMap.get(symbol);
+                syncLog.setSyncDate(LocalDate.now());
+                stockSyncLogRepository.save(syncLog);
+            } else {
+                StockSyncLog syncLog = new StockSyncLog();
+                syncLog.setSymbol(symbol);
+                syncLog.setSyncDate(LocalDate.now());
+                stockSyncLogRepository.save(syncLog);
+                syncLogMap.put(symbol, syncLog);
+            }
+
+            if (insertedCount > 0) {
+                try {
+                    log.info("成功插入{}条新记录，执行延时", insertedCount);
+                    Thread.sleep(3000 + insertedCount * 5L);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("延时被中断", e);
+                }
+            }
+            return insertedCount;
+        } catch (org.springframework.dao.DataAccessResourceFailureException e) {
+            log.error("数据库连接异常，跳过该股票: symbol={}, 错误: {}", symbol, e.getMessage());
+            return -1;
+        } catch (Exception e) {
+            log.error("处理股票时发生异常: symbol={}, 错误: {}", symbol, e.getMessage(), e);
+            return -1;
         }
     }
 
