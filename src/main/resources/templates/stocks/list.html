@@ -2,333 +2,462 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>股票数据列表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票行情</title>
     <style>
-        /* 分页容器固定定位样式 */
-        .pagination {
-            /* 固定定位在视口底部 */
-            position: fixed;
-            /* 距离底部20px */
-            bottom: 20px;
-            /* 水平居中定位 */
-            left: 50%;
-            /* X轴反向平移50%实现居中 */
-            transform: translateX(-50%);
-            /* 白色背景 */
-            background: white;
-            /* 内边距15px */
-            padding: 15px;
-            /* 8px圆角边框 */
-            border-radius: 8px;
-            /* 添加阴影效果 */
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            /* 确保分页在最顶层 */
-            z-index: 1000;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-            /* 新增单行滚动布局 */
-            /* 启用flex布局 */
-            display: flex;
-            /* 禁止换行 */
-            flex-wrap: nowrap;
-            /* 横向溢出显示滚动条 */
-            overflow-x: auto;
-            /* 按钮间距8px */
-            gap: 8px;
-            /* 限制最大宽度为视口宽度-40px */
-            max-width: calc(100vw - 40px);
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            padding-bottom: 100px;
         }
 
-        /* 分页链接样式优化 */
-        .pagination a {
-            /* 行内flex布局 */
-            display: inline-flex;
-            /* 垂直居中 */
-            align-items: center;
-            /* 水平居中 */
-            justify-content: center;
-            /* 内边距8px上下，16px左右 */
-            padding: 8px 16px;
-            /* 外边距0上下，4px左右 */
-            margin: 0 4px;
-            /* 1px灰色边框 */
-            border: 1px solid #ddd;
-            /* 4px圆角 */
-            border-radius: 4px;
-            /* 移除下划线 */
-            text-decoration: none;
-            /* 深灰色文字 */
-            color: #333;
-            /* 防止内容压缩 */
-            flex-shrink: 0;
-            /* 最小宽度36px */
-            min-width: 36px;
-            /* 添加过渡动画 */
-            transition: all 0.2s;
-        }
-
-        /* 当前页样式 */
-        .pagination a.current {
-            /* 蓝色背景 */
-            background-color: #007bff;
-            /* 白色文字 */
-            color: white;
-            /* 边框颜色与背景一致 */
-            border-color: #007bff;
-        }
-
-        /* 滚动条样式优化 */
-        /* WebKit浏览器滚动条整体样式 */
-        .pagination::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        /* 滚动条轨道样式 */
-        .pagination::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        /* 滚动条滑块样式 */
-        .pagination::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            /* 移动端按钮缩小 */
-            .pagination a {
-                min-width: 32px;
-                padding: 6px 12px;
-            }
-        }
-
-        /* 表格容器：控制横向滚动 */
-        .table-container {
-            overflow-x: auto; /* 启用横向滚动 */
-            -webkit-overflow-scrolling: touch; /* 移动端滚动优化 */
-            width: 100%;
-            margin-bottom: 120px; /* 为分页栏预留空间 */
-        }
-
-        /* 表格样式 */
-        .stock-table {
-            width: max-content; /* 让表格宽度由内容决定 */
-            min-width: 100%; /* 至少撑满容器 */
-            table-layout: auto; /* 列宽根据内容自适应 */
-            border-collapse: collapse;
-        }
-
-        /* 单元格样式 */
-        .stock-table td, .stock-table th {
-            white-space: nowrap; /* 禁止换行 */
-            text-overflow: clip; /* 禁用省略号 */
-            padding: 8px 16px; /* 合理间距 */
-            border: 1px solid #ddd;
-        }
-
-        /* 可选：给表头添加固定背景 */
-        .stock-table thead th {
+        .top-bar {
             position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #13132b;
+            border-bottom: 1px solid #1e1e3a;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-bar form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .top-bar input[type="text"] {
+            background: #1a1a35;
+            border: 1px solid #2a2a50;
+            color: #e0e0e0;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 220px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .top-bar input[type="text"]:focus {
+            border-color: #e94560;
+        }
+
+        .top-bar input[type="text"]::placeholder {
+            color: #666;
+        }
+
+        .btn-search {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #d63850;
+        }
+
+        .top-bar .meta-info {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .card-list {
+            max-width: 820px;
+            margin: 16px auto;
+            padding: 0 16px;
+        }
+
+        .stock-card {
+            display: flex;
+            align-items: stretch;
+            background: #1a1a2e;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: transform 0.15s, box-shadow 0.15s;
+            cursor: default;
+        }
+
+        .stock-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.08);
+        }
+
+        .card-stripe {
+            width: 4px;
+            flex-shrink: 0;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .card-stripe.up   { background: #e94560; }
+        .card-stripe.down { background: #4caf50; }
+        .card-stripe.flat { background: #555; }
+
+        .card-body {
+            flex: 1;
+            padding: 14px 18px;
+            min-width: 0;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card-symbol {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+            letter-spacing: 0.5px;
+        }
+
+        .card-name {
+            font-size: 13px;
+            color: #a0a0b0;
+        }
+
+        .market-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .market-tag.sh {
+            background: #2a1a1a;
+            color: #e94560;
+        }
+
+        .market-tag.sz {
+            background: #1a2a1a;
+            color: #4caf50;
+        }
+
+        .card-time {
+            margin-left: auto;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .card-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .card-price {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .card-price.up   { color: #e94560; }
+        .card-price.down { color: #4caf50; }
+        .card-price.flat { color: #ccc; }
+
+        .card-change-badge {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 5px;
+            line-height: 1;
+        }
+
+        .card-change-badge.up {
+            background: rgba(233, 69, 96, 0.15);
+            color: #e94560;
+        }
+
+        .card-change-badge.down {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .card-change-badge.flat {
+            background: rgba(136, 136, 136, 0.10);
+            color: #888;
+        }
+
+        .card-change-amount {
+            font-size: 13px;
+        }
+
+        .card-change-amount.up   { color: #e94560; }
+        .card-change-amount.down { color: #4caf50; }
+        .card-change-amount.flat { color: #888; }
+
+        .card-meta-row {
+            display: flex;
+            gap: 24px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .card-meta-row span strong {
+            color: #b0b0b0;
+            font-weight: 500;
+            margin-right: 4px;
+        }
+
+        .pagination {
+            position: fixed;
+            bottom: 0;
             left: 0;
-            background: white;
-            z-index: 1;
+            right: 0;
+            background: #13132b;
+            border-top: 1px solid #1e1e3a;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination span.pg-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-decoration: none;
+            color: #a0a0b0;
+            background: #1a1a35;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .pagination a:hover {
+            background: #2a2a50;
+            color: #e0e0e0;
+        }
+
+        .pagination a.current,
+        .pagination span.current {
+            background: #e94560;
+            color: white;
+            font-weight: 600;
+        }
+
+        .pagination a.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .jump-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .jump-box input[type="number"] {
+            background: #1a1a35;
+            border: 1px solid #2a2a50;
+            color: #e0e0e0;
+            padding: 6px 8px;
+            border-radius: 5px;
+            width: 50px;
+            font-size: 13px;
+            text-align: center;
+            outline: none;
+        }
+
+        .jump-box input[type="number"]:focus {
+            border-color: #e94560;
+        }
+
+        .jump-box .btn-go {
+            background: #2a2a50;
+            color: #e0e0e0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .jump-box .btn-go:hover {
+            background: #e94560;
+        }
+
+        .page-size-info {
+            margin-left: 12px;
+            font-size: 12px;
+            color: #666;
         }
 
         .version-footer {
             position: fixed;
-            bottom: 0;
+            bottom: 52px;
             right: 16px;
-            padding: 6px 14px;
-            background: rgba(0,0,0,0.06);
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.04);
             border-radius: 4px 4px 0 0;
-            font-size: 12px;
-            color: #999;
-            z-index: 999;
+            font-size: 11px;
+            color: #555;
+            z-index: 99;
         }
 
         .version-sep {
             margin: 0 6px;
-            color: #ccc;
+            color: #444;
+        }
+
+        @media (max-width: 768px) {
+            .card-list {
+                padding: 0 8px;
+                margin: 10px auto;
+            }
+
+            .card-body {
+                padding: 12px 14px;
+            }
+
+            .card-price {
+                font-size: 22px;
+            }
+
+            .card-meta-row {
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+
+            .top-bar {
+                padding: 10px 12px;
+            }
+
+            .top-bar input[type="text"] {
+                width: 140px;
+                font-size: 13px;
+            }
+
+            .pagination {
+                padding: 10px 12px;
+                gap: 2px;
+            }
+
+            .pagination a,
+            .pagination span.pg-num {
+                min-width: 28px;
+                height: 30px;
+                font-size: 12px;
+                padding: 0 6px;
+            }
+
+            .jump-box {
+                margin-left: 6px;
+            }
+
+            .jump-box input[type="number"] {
+                width: 40px;
+                font-size: 12px;
+            }
+
+            .version-footer {
+                bottom: 48px;
+                right: 8px;
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- 股票搜索表单 -->
-<form th:action="@{/stocks}" method="get">
-    <input type="text" name="symbol" placeholder="输入股票代码" th:value="${symbol}">
-    <button type="submit">搜索</button>
-</form>
-
-<!-- 股票数据表格容器 -->
-<div class="table-container">
-<table class="stock-table">
-    <thead>
-    <tr>
-        <!-- 基础信息 -->
-        <th class="fixed-col">代码</th>
-        <th>名称</th>
-
-        <!-- 核心价格信息 -->
-        <th>最新价</th>
-        <th>涨跌额</th>
-        <th>涨跌幅</th>
-        <th>昨收</th>
-        <th>今开</th>
-        <th>最高</th>
-        <th>最低</th>
-
-        <!-- 买卖盘信息 -->
-        <th>买一价</th>
-        <th>卖一价</th>
-
-        <!-- 成交量与金额 -->
-        <th>成交量(股)</th>
-        <th>成交额(元)</th>
-
-        <!-- 财务指标 -->
-        <th>市盈率</th>
-        <th>市净率</th>
-        <th>总市值</th>
-        <th>流通市值</th>
-        <th>换手率</th>
-
-        <!-- 时间信息 -->
-        <th>最后交易</th>
-        <th>更新时间</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- 遍历显示股票数据 -->
-    <tr th:each="stock : ${stocks.content}">
-        <!-- 基础信息 -->
-        <td class="fixed-col" th:text="${stock.symbol}">000001</td>
-        <td th:text="${stock.name}">示例股票</td>
-
-        <!-- 核心价格列 -->
-        <!-- tradePrice (precision=12, scale=4) -->
-        <td th:text="${stock.tradePrice != null} ?
-                ${#numbers.formatDecimal(stock.tradePrice, 1, 2)} : '--'">
-            12.3450
-        </td>
-
-        <!-- priceChange (precision=12, scale=4) -->
-        <td th:text="${stock.priceChange != null} ?
-                ${#numbers.formatDecimal(stock.priceChange, 1, 2)} : '--'"
-            th:styleappend="${stock.priceChange != null} ?
-                (${stock.priceChange} >= 0 ? 'color:red;' : 'color:green;') : ''">
-            +0.1234
-        </td>
-
-        <!-- changePercent (precision=6, scale=3) -->
-        <td th:text="${stock.changePercent != null} ?
-                ${#numbers.formatDecimal(stock.changePercent, 1, 2)} + '%' : '--'"
-            th:styleappend="${stock.changePercent != null} ?
-                (${stock.changePercent} >= 0 ? 'color:red;' : 'color:green;') : ''">
-            1.234%
-        </td>
-
-        <!-- previousClose (precision=12, scale=4) -->
-        <td th:text="${stock.previousClose != null} ?
-                ${#numbers.formatDecimal(stock.previousClose, 1, 2)} : '--'">
-            12.2200
-        </td>
-
-        <!-- openPrice (precision=12, scale=4) -->
-        <td th:text="${stock.openPrice != null} ?
-                ${#numbers.formatDecimal(stock.openPrice, 1, 2)} : '--'">
-            12.3000
-        </td>
-
-        <!-- highPrice (precision=12, scale=4) -->
-        <td th:text="${stock.highPrice != null} ?
-                ${#numbers.formatDecimal(stock.highPrice, 1, 2)} : '--'">
-            12.5000
-        </td>
-
-        <!-- lowPrice (precision=12, scale=4) -->
-        <td th:text="${stock.lowPrice != null} ?
-                ${#numbers.formatDecimal(stock.lowPrice, 1, 2)} : '--'">
-            12.2000
-        </td>
-
-        <!-- bidPrice (precision=12, scale=4) -->
-        <td th:text="${stock.bidPrice != null} ?
-                ${#numbers.formatDecimal(stock.bidPrice, 1, 2)} : '--'">
-            12.3400
-        </td>
-
-        <!-- askPrice (precision=12, scale=4) -->
-        <td th:text="${stock.askPrice != null} ?
-                ${#numbers.formatDecimal(stock.askPrice, 1, 2)} : '--'">
-            12.3500
-        </td>
-
-        <!-- volume -->
-        <td th:text="${stock.volume != null} ?
-                ${#numbers.formatInteger(stock.volume, 0, 'COMMA')} : '--'">
-            1,234,567
-        </td>
-
-        <!-- amount (precision=20, scale=4) -->
-        <td th:text="${stock.amount != null} ?
-                '¥' + ${#numbers.formatDecimal(stock.amount, 1, 2)} : '--'">
-            ¥123,456.7890
-        </td>
-
-        <!-- peRatio (precision=10, scale=2) -->
-        <td th:text="${stock.peRatio != null} ?
-                ${#numbers.formatDecimal(stock.peRatio, 1, 2)} : '--'">
-            15.34
-        </td>
-
-        <!-- pbRatio (precision=10, scale=3) -->
-        <td th:text="${stock.pbRatio != null} ?
-                ${#numbers.formatDecimal(stock.pbRatio, 1, 2)} : '--'">
-            1.234
-        </td>
-
-        <!-- marketCap (precision=20, scale=4) -->
-        <td th:text="${stock.marketCap != null} ?
-                '¥' + ${#numbers.formatDecimal(stock.marketCap, 1, 2)} : '--'">
-            ¥1.2345万亿
-        </td>
-
-        <!-- circulatingMarketCap (precision=20, scale=4) -->
-        <td th:text="${stock.circulatingMarketCap != null} ?
-                '¥' + ${#numbers.formatDecimal(stock.circulatingMarketCap, 1, 2)} : '--'">
-            ¥9876.5432亿
-        </td>
-
-        <!-- turnoverRate (precision=10, scale=5) -->
-        <td th:text="${stock.turnoverRate != null} ?
-                ${#numbers.formatDecimal(stock.turnoverRate, 1, 2)} + '%' : '--'">
-            1.23456%
-        </td>
-
-        <!-- 时间信息 -->
-        <td th:text="${stock.lastTradeTime != null} ?
-                ${#temporals.format(stock.lastTradeTime, 'HH:mm:ss')} : '--'">
-            15:00:00
-        </td>
-        <td th:text="${stock.createdAt != null} ?
-                ${#temporals.format(stock.createdAt, 'yyyy-MM-dd HH:mm')} : '--'">
-            2023-08-10 15:30
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div class="top-bar">
+    <form th:action="@{/stocks}" method="get">
+        <input type="text" name="symbol" placeholder="🔍 搜索代码/名称" th:value="${symbol}">
+        <button type="submit" class="btn-search">搜索</button>
+    </form>
+    <span class="meta-info">
+        <span th:if="${stocks != null}">共 <span th:text="${stocks.totalElements}">0</span> 只</span>
+        <span th:if="${stocks != null && !stocks.content.isEmpty()}">
+            | 更新于 <span th:text="${#temporals.format(stocks.content[0].createdAt, 'yyyy-MM-dd HH:mm')}">--</span>
+        </span>
+    </span>
 </div>
 
-<!-- 分页导航 -->
-<div class="pagination" th:if="${stocks.totalPages > 1}">
-    <span th:if="${!stocks.first}">
-        <a th:href="@{/stocks(page=0, size=${stocks.size}, symbol=${symbol})}">首页</a>
-    </span>
-    <span th:if="${!stocks.first}">
-        <a th:href="@{/stocks(page=${stocks.number - 1}, size=${stocks.size}, symbol=${symbol})}">上页</a>
-    </span>
+<div class="card-list">
+
+    <div th:if="${stocks == null || stocks.content.isEmpty()}" style="text-align:center;padding:60px;color:#666">
+        <p style="font-size:16px">暂无数据</p>
+        <p style="font-size:13px;margin-top:8px">尝试其他搜索条件</p>
+    </div>
+
+    <div th:each="stock : ${stocks.content}"
+         class="stock-card">
+
+        <th:block th:with="
+            chg=${stock.changePercent != null ? stock.changePercent.doubleValue() : 0.0},
+            dir=${chg > 0 ? 'up' : (chg < 0 ? 'down' : 'flat')}">
+
+            <div th:class="'card-stripe ' + ${dir}"></div>
+
+            <div class="card-body">
+                <div class="card-header">
+                    <span class="card-symbol" th:text="${stock.symbol}">000001</span>
+                    <span class="card-name" th:text="${stock.name}">示例股票</span>
+                    <span th:class="'market-tag ' + (${stock.symbol != null && stock.symbol.startsWith('sz')} ? 'sz' : 'sh')"
+                          th:text="${stock.symbol != null && stock.symbol.startsWith('sz')} ? '深' : '沪'">沪</span>
+                    <span class="card-time"
+                          th:text="${stock.lastTradeTime != null ? #temporals.format(stock.lastTradeTime, 'HH:mm:ss') : '--'}">
+                        15:00:00</span>
+                </div>
+
+                <div class="card-price-row">
+                    <span th:class="'card-price ' + ${dir}"
+                          th:text="${stock.tradePrice != null ? #numbers.formatDecimal(stock.tradePrice, 1, 2) : '--'}">
+                        12.34</span>
+
+                    <span th:class="'card-change-badge ' + ${dir}"
+                          th:text="${stock.changePercent != null ? #numbers.formatDecimal(stock.changePercent, 1, 2) + '%' : '--'}">
+                        1.23%</span>
+
+                    <span th:class="'card-change-amount ' + ${dir}"
+                          th:text="${stock.priceChange != null ? (stock.priceChange.doubleValue() >= 0 ? '+' : '') + #numbers.formatDecimal(stock.priceChange, 1, 2) : '--'}">
+                        +0.12</span>
+                </div>
+
+                <div class="card-meta-row">
+                    <span><strong>成交量</strong> <span th:text="${stock.volume != null ? #numbers.formatInteger(stock.volume, 0, 'COMMA') : '--'}">0</span></span>
+                    <span><strong>换手率</strong> <span th:text="${stock.turnoverRate != null ? #numbers.formatDecimal(stock.turnoverRate, 1, 2) + '%' : '--'}">0.00%</span></span>
+                    <span><strong>市盈率</strong> <span th:text="${stock.peRatio != null ? #numbers.formatDecimal(stock.peRatio, 1, 2) : '--'}">0.00</span></span>
+                </div>
+            </div>
+        </th:block>
+    </div>
+
+</div>
+
+<div class="pagination" th:if="${stocks != null && stocks.totalPages > 1}">
+    <a th:classappend="${stocks.first} ? 'disabled'"
+       th:href="${stocks.first} ? '#' : @{/stocks(page=0, size=${stocks.size}, symbol=${symbol})}">首页</a>
+    <a th:classappend="${stocks.first} ? 'disabled'"
+       th:href="${stocks.first} ? '#' : @{/stocks(page=${stocks.number - 1}, size=${stocks.size}, symbol=${symbol})}">上页</a>
 
     <span th:each="i : ${#numbers.sequence(0, stocks.totalPages - 1)}">
         <a th:href="@{/stocks(page=${i}, size=${stocks.size}, symbol=${symbol})}"
@@ -336,12 +465,19 @@
            th:classappend="${i == stocks.number} ? 'current'"></a>
     </span>
 
-    <span th:if="${!stocks.last}">
-        <a th:href="@{/stocks(page=${stocks.number + 1}, size=${stocks.size}, symbol=${symbol})}">下页</a>
+    <a th:classappend="${stocks.last} ? 'disabled'"
+       th:href="${stocks.last} ? '#' : @{/stocks(page=${stocks.number + 1}, size=${stocks.size}, symbol=${symbol})}">下页</a>
+    <a th:classappend="${stocks.last} ? 'disabled'"
+       th:href="${stocks.last} ? '#' : @{/stocks(page=${stocks.totalPages - 1}, size=${stocks.size}, symbol=${symbol})}">末页</a>
+
+    <span class="jump-box">
+        跳至
+        <input type="number" id="jumpPage" min="1" th:max="${stocks.totalPages}" th:value="${stocks.number + 1}">
+        页
+        <button class="btn-go" onclick="jumpToPage()">GO</button>
     </span>
-    <span th:if="${!stocks.last}">
-        <a th:href="@{/stocks(page=${stocks.totalPages - 1}, size=${stocks.size}, symbol=${symbol})}">末页</a>
-    </span>
+
+    <span class="page-size-info">每页 <span th:text="${stocks.size}">30</span> 条</span>
 </div>
 
 <div class="version-footer" th:if="${version != null}">
@@ -349,6 +485,20 @@
     <span class="version-sep">|</span>
     <span th:text="${commitId}">abc1234</span>
 </div>
+
+<script>
+    function jumpToPage() {
+        var input = document.getElementById('jumpPage');
+        var page = parseInt(input.value);
+        var max = parseInt(input.max);
+        if (isNaN(page) || page < 1) page = 1;
+        if (page > max) page = max;
+
+        var params = new URLSearchParams(window.location.search);
+        params.set('page', page - 1);
+        window.location.search = params.toString();
+    }
+</script>
 
 </body>
 </html>
