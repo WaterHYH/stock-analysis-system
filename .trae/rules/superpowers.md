@@ -49,6 +49,8 @@ Invoke-WebRequest -Uri "http://localhost:8080/stocks" -UseBasicParsing -TimeoutS
 
 本地运行成功后，必须推送到服务器验证：
 
+SSH Key：`~/.ssh/stock_deploy_temp`（免密，已配置）
+
 **1. 打包：**
 ```powershell
 mvn clean package -DskipTests
@@ -56,17 +58,17 @@ mvn clean package -DskipTests
 
 **2. 上传到服务器：**
 ```powershell
-scp target\demo-0.0.1-SNAPSHOT.jar root@120.76.43.179:/var/www/stock/app/
+scp -i $env:USERPROFILE\.ssh\stock_deploy_temp target\demo-0.0.1-SNAPSHOT.jar root@120.76.43.179:/var/www/stock/app/
 ```
 
 **3. 服务器重启：**
-```bash
-ssh root@120.76.43.179 "pkill -9 -f demo-0.0.1-SNAPSHOT.jar; sleep 3; nohup java -jar /var/www/stock/app/demo-0.0.1-SNAPSHOT.jar > /var/www/stock/app/app.log 2>&1 &"
+```powershell
+ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "pkill -9 -f demo-0.0.1-SNAPSHOT.jar; sleep 3; nohup java -jar /var/www/stock/app/demo-0.0.1-SNAPSHOT.jar > /var/www/stock/app/app.log 2>&1 &"
 ```
 
 **4. 验证服务器启动成功：**
-```bash
-ssh root@120.76.43.179 "sleep 5; tail -20 /var/www/stock/app/app.log"
+```powershell
+ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "sleep 10; tail -30 /var/www/stock/app/app.log"
 ```
 
 检查日志中出现 `Started StockApplication` 且无 `APPLICATION FAILED TO START` 错误，则服务器运行成功。如果启动失败，根据错误日志继续修改代码。**
