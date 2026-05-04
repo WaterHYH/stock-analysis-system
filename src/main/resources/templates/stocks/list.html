@@ -312,21 +312,15 @@
             color: #666;
         }
 
-        .version-footer {
-            position: fixed;
-            bottom: 52px;
-            right: 16px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 4px 4px 0 0;
-            font-size: 11px;
+        .pg-ellipsis {
             color: #555;
-            z-index: 99;
+            font-size: 14px;
+            padding: 0 2px;
         }
 
         .version-sep {
             margin: 0 6px;
-            color: #444;
+            color: #555;
         }
 
         @media (max-width: 768px) {
@@ -377,11 +371,6 @@
             .jump-box input[type="number"] {
                 width: 40px;
                 font-size: 12px;
-            }
-
-            .version-footer {
-                bottom: 48px;
-                right: 8px;
             }
         }
     </style>
@@ -453,37 +442,41 @@
 
 </div>
 
-<div class="pagination" th:if="${stocks != null && stocks.totalPages > 1}">
+<div class="pagination" th:if="${stocks != null && totalPages > 1}">
     <a th:classappend="${stocks.first} ? 'disabled'"
        th:href="${stocks.first} ? '#' : @{/stocks(page=0, size=${stocks.size}, symbol=${symbol})}">首页</a>
     <a th:classappend="${stocks.first} ? 'disabled'"
        th:href="${stocks.first} ? '#' : @{/stocks(page=${stocks.number - 1}, size=${stocks.size}, symbol=${symbol})}">上页</a>
 
-    <span th:each="i : ${#numbers.sequence(0, stocks.totalPages - 1)}">
+    <a th:if="${startIdx > 0}" th:href="@{/stocks(page=0, size=${stocks.size}, symbol=${symbol})}"
+       th:classappend="${0 == stocks.number} ? 'current'">1</a>
+    <span th:if="${startIdx > 1}" class="pg-ellipsis">...</span>
+
+    <th:block th:each="i : ${#numbers.sequence(startIdx, endIdx)}">
         <a th:href="@{/stocks(page=${i}, size=${stocks.size}, symbol=${symbol})}"
            th:text="${i + 1}"
            th:classappend="${i == stocks.number} ? 'current'"></a>
-    </span>
+    </th:block>
+
+    <span th:if="${endIdx < totalPages - 2}" class="pg-ellipsis">...</span>
+    <a th:if="${endIdx < totalPages - 1}"
+       th:href="@{/stocks(page=${totalPages - 1}, size=${stocks.size}, symbol=${symbol})}"
+       th:text="${totalPages}"
+       th:classappend="${totalPages - 1 == stocks.number} ? 'current'"></a>
 
     <a th:classappend="${stocks.last} ? 'disabled'"
        th:href="${stocks.last} ? '#' : @{/stocks(page=${stocks.number + 1}, size=${stocks.size}, symbol=${symbol})}">下页</a>
     <a th:classappend="${stocks.last} ? 'disabled'"
-       th:href="${stocks.last} ? '#' : @{/stocks(page=${stocks.totalPages - 1}, size=${stocks.size}, symbol=${symbol})}">末页</a>
+       th:href="${stocks.last} ? '#' : @{/stocks(page=${totalPages - 1}, size=${stocks.size}, symbol=${symbol})}">末页</a>
 
     <span class="jump-box">
         跳至
-        <input type="number" id="jumpPage" min="1" th:max="${stocks.totalPages}" th:value="${stocks.number + 1}">
+        <input type="number" id="jumpPage" min="1" th:max="${totalPages}" th:value="${stocks.number + 1}">
         页
         <button class="btn-go" onclick="jumpToPage()">GO</button>
     </span>
 
-    <span class="page-size-info">每页 <span th:text="${stocks.size}">30</span> 条</span>
-</div>
-
-<div class="version-footer" th:if="${version != null}">
-    <span th:text="${version}">v1</span>
-    <span class="version-sep">|</span>
-    <span th:text="${commitId}">abc1234</span>
+    <span class="page-size-info" th:text="${version + ' | ' + commitId}">v1 | abc1234</span>
 </div>
 
 <script>

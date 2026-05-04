@@ -45,6 +45,13 @@ public class StockWebController {
         model.addAttribute("symbol", symbol);
         model.addAttribute("version", versionConfig.getVersion());
         model.addAttribute("commitId", versionConfig.getCommitId());
+
+        int totalPages = stocks.getTotalPages();
+        int cur = stocks.getNumber();
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startIdx", Math.max(0, cur - 4));
+        model.addAttribute("endIdx", Math.min(totalPages - 1, cur + 4));
+
         return "stocks/list";
     }
 }
