@@ -68,10 +68,12 @@ ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "systemctl res
 
 **4. 验证服务器启动成功：**
 ```powershell
-ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "grep 'Started StockApplication' /var/www/stock/app/app.log | tail -1; curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/test"
+ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "ls -t /var/www/stock/app/logs/stock-*.log | head -1 | xargs grep 'Started StockApplication' | tail -1; curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/test"
 ```
 
-检查输出中出现 `Started StockApplication` 且 `http_code=200`，则服务器运行成功。如果 `is-active` 返回 `failed` 或 `inactive`，或 HTTP 返回非 200，则启动失败，继续修改。**
+检查输出中出现 `Started StockApplication` 且 `http_code=200`，则服务器运行成功。
+
+> 项目日志在 `/var/www/stock/app/logs/`，当前活跃日志为最新 `stock-{时间}.log`（LogStartupListener 启动时自动归档）。
 
 ## 故障处理
 
