@@ -1,0 +1,307 @@
+<h2>股票列表页界面优化 — 布局方案对比</h2>
+<p class="subtitle">底部是当前界面，顶部是三种优化方案。请选择一个你喜欢的布局风格</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>经典券商风格</h3>
+      <p>紧凑数据表 + 红涨绿跌 + 顶部搜索栏 + 底部固定分页。参考同花顺/大智慧 PC 端风格</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>现代卡片风格</h3>
+      <p>每只股票一张卡片 + 关键数据高亮 + 涨跌背景色条。参考东方财富/雪球移动端风格</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>企业级数据面板</h3>
+      <p>表格式但现代化 + 斑马纹 + 冻结表头 + K线迷你图 + 排序筛选。参考 Bloomberg Terminal 简化版</p>
+    </div>
+  </div>
+</div>
+
+<h3>方案 A — 经典券商风格</h3>
+<p class="subtitle">紧凑表格，红涨绿跌，一眼扫过大量数据</p>
+
+<div class="mockup">
+  <div class="mockup-header">预览：经典券商风股票列表</div>
+  <div class="mockup-body">
+    <div style="background:#1a1a2e;padding:12px 16px;border-radius:4px 4px 0 0;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#e0e0e0;font-weight:bold;font-size:14px">📊 股票行情</span>
+      <div style="display:flex;gap:8px">
+        <input style="background:#16213e;border:1px solid #0f3460;color:#ccc;padding:5px 10px;border-radius:3px;font-size:12px;width:160px" placeholder="🔍 输入代码/名称">
+        <button style="background:#e94560;color:white;border:none;padding:5px 14px;border-radius:3px;font-size:12px;cursor:pointer">搜索</button>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;font-family:Consolas,monospace">
+      <thead>
+        <tr style="background:#16213e;color:#a0a0b0">
+          <th style="padding:8px;text-align:left;position:sticky">代码</th>
+          <th style="padding:8px;text-align:left">名称</th>
+          <th style="padding:8px;text-align:right">最新价</th>
+          <th style="padding:8px;text-align:right">涨跌幅</th>
+          <th style="padding:8px;text-align:right">涨跌额</th>
+          <th style="padding:8px;text-align:right">成交量</th>
+          <th style="padding:8px;text-align:right">换手率</th>
+          <th style="padding:8px;text-align:right">市盈率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #1a1a3e;background:#0f0f23">
+          <td style="padding:7px 8px;color:#4fc3f7">600519</td>
+          <td style="padding:7px 8px;color:#e0e0e0">贵州茅台</td>
+          <td style="padding:7px 8px;text-align:right;color:#ff5252;font-weight:bold">1,685.00</td>
+          <td style="padding:7px 8px;text-align:right;color:#ff5252">+2.35%</td>
+          <td style="padding:7px 8px;text-align:right;color:#ff5252">+38.68</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">4.2万手</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">0.38%</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">28.5</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a3e;background:#0f0f23">
+          <td style="padding:7px 8px;color:#4fc3f7">000858</td>
+          <td style="padding:7px 8px;color:#e0e0e0">五粮液</td>
+          <td style="padding:7px 8px;text-align:right;color:#66bb6a;font-weight:bold">142.80</td>
+          <td style="padding:7px 8px;text-align:right;color:#66bb6a">-1.12%</td>
+          <td style="padding:7px 8px;text-align:right;color:#66bb6a">-1.62</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">8.5万手</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">0.52%</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">18.2</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a3e;background:#0f0f23">
+          <td style="padding:7px 8px;color:#4fc3f7">300750</td>
+          <td style="padding:7px 8px;color:#e0e0e0">宁德时代</td>
+          <td style="padding:7px 8px;text-align:right;color:#ff5252;font-weight:bold">206.30</td>
+          <td style="padding:7px 8px;text-align:right;color:#ff5252">+5.61%</td>
+          <td style="padding:7px 8px;text-align:right;color:#ff5252">+10.96</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">25.3万手</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">3.15%</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">35.7</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1a1a3e;background:#0f0f23">
+          <td style="padding:7px 8px;color:#4fc3f7">601318</td>
+          <td style="padding:7px 8px;color:#e0e0e0">中国平安</td>
+          <td style="padding:7px 8px;text-align:right;color:#66bb6a;font-weight:bold">43.52</td>
+          <td style="padding:7px 8px;text-align:right;color:#66bb6a">-0.48%</td>
+          <td style="padding:7px 8px;text-align:right;color:#66bb6a">-0.21</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">32.1万手</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">0.89%</td>
+          <td style="padding:7px 8px;text-align:right;color:#888">9.8</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="background:#1a1a2e;padding:10px;text-align:center;border-radius:0 0 4px 4px;display:flex;justify-content:center;gap:4px;font-size:12px">
+      <span style="background:#e94560;color:white;padding:5px 12px;border-radius:3px">1</span>
+      <span style="background:#16213e;color:#a0a0b0;padding:5px 12px;border-radius:3px">2</span>
+      <span style="background:#16213e;color:#a0a0b0;padding:5px 12px;border-radius:3px">3</span>
+      <span style="background:#16213e;color:#a0a0b0;padding:5px 12px;border-radius:3px">...</span>
+      <span style="background:#16213e;color:#a0a0b0;padding:5px 12px;border-radius:3px">166</span>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros"><h4>优点</h4><ul><li>信息密度高，一屏看大量股票</li><li>列对齐便于快速扫读对比</li><li>符合职业股民操作习惯</li></ul></div>
+  <div class="cons"><h4>缺点</h4><ul><li>移动端小屏体验差</li><li>视觉单调缺乏层次</li><li>新人学习成本稍高</li></ul></div>
+</div>
+
+<hr style="margin:32px 0;border-color:#333">
+
+<h3>方案 B — 现代卡片风格</h3>
+<p class="subtitle">卡片式关注关键指标，涨跌背景色一目了然</p>
+
+<div class="mockup">
+  <div class="mockup-header">预览：卡片式股票列表</div>
+  <div class="mockup-body" style="background:#f5f6fa;padding:16px">
+    <div style="background:white;padding:12px 16px;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+      <input style="border:1px solid #e0e0e0;padding:8px 12px;border-radius:6px;font-size:13px;width:200px" placeholder="🔍 搜索股票...">
+      <span style="font-size:12px;color:#999">共 5,218 只</span>
+    </div>
+    <div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-left:4px solid #ff5252">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <span style="font-weight:bold;font-size:15px">600519</span>
+          <span style="color:#666;margin-left:8px;font-size:13px">贵州茅台</span>
+          <span style="background:#fff3e0;color:#e65100;font-size:10px;padding:2px 6px;border-radius:3px;margin-left:8px">沪市</span>
+        </div>
+        <span style="font-size:11px;color:#999">15:00:00</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font-size:22px;font-weight:bold;color:#ff5252">1,685.00</span>
+        <span style="background:#ffebee;color:#ff5252;padding:3px 10px;border-radius:4px;font-size:13px;font-weight:bold">+2.35%</span>
+        <span style="color:#ff5252;font-size:13px">+38.68</span>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:8px;font-size:12px;color:#888">
+        <span>开盘 1,646.32</span><span>最高 1,692.50</span><span>最低 1,640.00</span>
+        <span>成交量 4.2万</span><span>换手 0.38%</span>
+      </div>
+    </div>
+    <div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);border-left:4px solid #4caf50">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <span style="font-weight:bold;font-size:15px">000858</span>
+          <span style="color:#666;margin-left:8px;font-size:13px">五粮液</span>
+          <span style="background:#e8f5e9;color:#2e7d32;font-size:10px;padding:2px 6px;border-radius:3px;margin-left:8px">深市</span>
+        </div>
+        <span style="font-size:11px;color:#999">15:00:00</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:16px">
+        <span style="font-size:22px;font-weight:bold;color:#4caf50">142.80</span>
+        <span style="background:#e8f5e9;color:#4caf50;padding:3px 10px;border-radius:4px;font-size:13px;font-weight:bold">-1.12%</span>
+        <span style="color:#4caf50;font-size:13px">-1.62</span>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:8px;font-size:12px;color:#888">
+        <span>开盘 144.42</span><span>最高 145.00</span><span>最低 142.10</span>
+        <span>成交量 8.5万</span><span>换手 0.52%</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:16px">
+      <span style="background:#1976d2;color:white;padding:6px 14px;border-radius:4px;font-size:12px">1</span>
+      <span style="background:#f5f5f5;padding:6px 14px;border-radius:4px;font-size:12px">2</span>
+      <span style="background:#f5f5f5;padding:6px 14px;border-radius:4px;font-size:12px">3</span>
+      <span style="background:#f5f5f5;padding:6px 14px;border-radius:4px;font-size:12px">...</span>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros"><h4>优点</h4><ul><li>视觉清晰，关键数据突出</li><li>移动端友好，触控方便</li><li>涨跌颜色区分直观</li></ul></div>
+  <div class="cons"><h4>缺点</h4><ul><li>信息密度低，需频繁滚动</li><li>对比多只股票时不便</li><li>每屏显示数量有限</li></ul></div>
+</div>
+
+<hr style="margin:32px 0;border-color:#333">
+
+<h3>方案 C — 企业级数据面板（推荐）</h3>
+<p class="subtitle">现代化表格 + 斑马纹 + 冻结表头 + 排序 + 迷你走势</p>
+
+<div class="mockup">
+  <div class="mockup-header">预览：企业级数据面板</div>
+  <div class="mockup-body" style="background:#f8f9fc">
+    <div style="background:white;padding:10px 16px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10">
+      <div style="display:flex;gap:8px">
+        <select style="border:1px solid #d0d0d0;padding:6px 10px;border-radius:4px;font-size:12px"><option>全部市场</option><option>沪市</option><option>深市</option></select>
+        <input style="border:1px solid #d0d0d0;padding:6px 10px;border-radius:4px;font-size:12px;width:180px" placeholder="🔍 代码/名称">
+        <button style="background:#1890ff;color:white;border:none;padding:6px 14px;border-radius:4px;font-size:12px">搜索</button>
+      </div>
+      <span style="font-size:12px;color:#999">共 5,218 只 | 更新于 15:00:00</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:#fafafa;border-bottom:2px solid #e8e8e8">
+          <th style="padding:10px 12px;text-align:left;color:#666;font-weight:500;position:sticky;top:0;background:#fafafa">代码 <span style="font-size:10px">⇅</span></th>
+          <th style="padding:10px 12px;text-align:left;color:#666;font-weight:500">名称</th>
+          <th style="padding:10px 12px;text-align:right;color:#666;font-weight:500">最新价</th>
+          <th style="padding:10px 12px;text-align:right;color:#666;font-weight:500">涨跌幅</th>
+          <th style="padding:10px 12px;text-align:center;color:#666;font-weight:500">走势</th>
+          <th style="padding:10px 12px;text-align:right;color:#666;font-weight:500">成交量</th>
+          <th style="padding:10px 12px;text-align:right;color:#666;font-weight:500">换手率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #f0f0f0;background:white">
+          <td style="padding:9px 12px"><span style="color:#1890ff;font-weight:500">600519</span></td>
+          <td style="padding:9px 12px">贵州茅台 <span style="background:#fff7e6;color:#d46b08;font-size:10px;padding:1px 5px;border-radius:2px">沪</span></td>
+          <td style="padding:9px 12px;text-align:right;font-weight:500;color:#cf1322">1,685.00</td>
+          <td style="padding:9px 12px;text-align:right"><span style="background:#fff1f0;color:#cf1322;padding:2px 8px;border-radius:4px;font-weight:500">+2.35%</span></td>
+          <td style="padding:9px 12px;text-align:center"><svg width="60" height="20"><polyline points="0,18 10,14 20,15 30,10 40,12 50,5 60,2" stroke="#cf1322" fill="none" stroke-width="1.5"/></svg></td>
+          <td style="padding:9px 12px;text-align:right">4.2万手</td>
+          <td style="padding:9px 12px;text-align:right">0.38%</td>
+        </tr>
+        <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa">
+          <td style="padding:9px 12px"><span style="color:#1890ff;font-weight:500">000858</span></td>
+          <td style="padding:9px 12px">五粮液 <span style="background:#f6ffed;color:#389e0d;font-size:10px;padding:1px 5px;border-radius:2px">深</span></td>
+          <td style="padding:9px 12px;text-align:right;font-weight:500;color:#389e0d">142.80</td>
+          <td style="padding:9px 12px;text-align:right"><span style="background:#f6ffed;color:#389e0d;padding:2px 8px;border-radius:4px;font-weight:500">-1.12%</span></td>
+          <td style="padding:9px 12px;text-align:center"><svg width="60" height="20"><polyline points="0,2 10,5 20,3 30,8 40,10 50,14 60,18" stroke="#389e0d" fill="none" stroke-width="1.5"/></svg></td>
+          <td style="padding:9px 12px;text-align:right">8.5万手</td>
+          <td style="padding:9px 12px;text-align:right">0.52%</td>
+        </tr>
+        <tr style="border-bottom:1px solid #f0f0f0;background:white">
+          <td style="padding:9px 12px"><span style="color:#1890ff;font-weight:500">300750</span></td>
+          <td style="padding:9px 12px">宁德时代 <span style="background:#f6ffed;color:#389e0d;font-size:10px;padding:1px 5px;border-radius:2px">深</span></td>
+          <td style="padding:9px 12px;text-align:right;font-weight:500;color:#cf1322">206.30</td>
+          <td style="padding:9px 12px;text-align:right"><span style="background:#fff1f0;color:#cf1322;padding:2px 8px;border-radius:4px;font-weight:500">+5.61%</span></td>
+          <td style="padding:9px 12px;text-align:center"><svg width="60" height="20"><polyline points="0,16 10,15 20,8 30,10 40,4 50,3 60,1" stroke="#cf1322" fill="none" stroke-width="1.5"/></svg></td>
+          <td style="padding:9px 12px;text-align:right">25.3万手</td>
+          <td style="padding:9px 12px;text-align:right">3.15%</td>
+        </tr>
+        <tr style="border-bottom:1px solid #f0f0f0;background:#fafafa">
+          <td style="padding:9px 12px"><span style="color:#1890ff;font-weight:500">601318</span></td>
+          <td style="padding:9px 12px">中国平安 <span style="background:#fff7e6;color:#d46b08;font-size:10px;padding:1px 5px;border-radius:2px">沪</span></td>
+          <td style="padding:9px 12px;text-align:right;font-weight:500;color:#389e0d">43.52</td>
+          <td style="padding:9px 12px;text-align:right"><span style="background:#f6ffed;color:#389e0d;padding:2px 8px;border-radius:4px;font-weight:500">-0.48%</span></td>
+          <td style="padding:9px 12px;text-align:center"><svg width="60" height="20"><polyline points="0,10 10,8 20,12 30,9 40,11 50,14 60,16" stroke="#389e0d" fill="none" stroke-width="1.5"/></svg></td>
+          <td style="padding:9px 12px;text-align:right">32.1万手</td>
+          <td style="padding:9px 12px;text-align:right">0.89%</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:white;border-top:1px solid #f0f0f0">
+      <span style="font-size:12px;color:#999">第 1/166 页</span>
+      <div style="display:flex;gap:4px">
+        <span style="background:#1890ff;color:white;padding:4px 10px;border-radius:3px;font-size:12px">1</span>
+        <span style="padding:4px 10px;border-radius:3px;font-size:12px;cursor:pointer">2</span>
+        <span style="padding:4px 10px;border-radius:3px;font-size:12px">3</span>
+        <span style="padding:4px 10px;font-size:12px;color:#999">...</span>
+        <span style="padding:4px 10px;border-radius:3px;font-size:12px">166</span>
+      </div>
+      <span style="font-size:12px;color:#999">每页 30 条</span>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros"><h4>优点</h4><ul><li>信息密度适中，视觉层次好</li><li>斑马纹 + 涨跌色块快速定位</li><li>迷你走势图直观展示趋势</li><li>支持排序和筛选</li><li>移动端横向滚动也可用</li></ul></div>
+  <div class="cons"><h4>缺点</h4><ul><li>迷你走势图需要后端数据支持</li><li>实现复杂度略高</li></ul></div>
+</div>
+
+<hr style="margin:32px 0;border-color:#333">
+
+<h3>当前界面（优化前）</h3>
+<p class="subtitle">参考：目前的白底全字段表格</p>
+
+<div class="mockup">
+  <div class="mockup-header">当前：原始表格式（字段过多、无视觉层次）</div>
+  <div class="mockup-body">
+    <div style="padding:10px;background:#fff;border:1px solid #ddd">
+      <input style="padding:5px;border:1px solid #ddd;margin-bottom:10px" placeholder="输入股票代码"> <button style="padding:5px 10px">搜索</button>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:#f5f5f5">
+        <th style="border:1px solid #ddd;padding:6px">代码</th><th style="border:1px solid #ddd;padding:6px">名称</th>
+        <th style="border:1px solid #ddd;padding:6px">最新价</th><th style="border:1px solid #ddd;padding:6px">涨跌额</th>
+        <th style="border:1px solid #ddd;padding:6px">涨跌幅</th><th style="border:1px solid #ddd;padding:6px">昨收</th>
+        <th style="border:1px solid #ddd;padding:6px">今开</th><th style="border:1px solid #ddd;padding:6px">最高</th>
+        <th style="border:1px solid #ddd;padding:6px">最低</th><th style="border:1px solid #ddd;padding:6px">买一价</th>
+        <th style="border:1px solid #ddd;padding:6px">卖一价</th><th style="border:1px solid #ddd;padding:6px">成交量</th>
+        <th style="border:1px solid #ddd;padding:6px">成交额</th><th style="border:1px solid #ddd;padding:6px">市盈率</th>
+        <th style="border:1px solid #ddd;padding:6px">市净率</th><th style="border:1px solid #ddd;padding:6px">总市值</th>
+        <th style="border:1px solid #ddd;padding:6px">流通市值</th><th style="border:1px solid #ddd;padding:6px">换手率</th>
+        <th style="border:1px solid #ddd;padding:6px">最后交易</th><th style="border:1px solid #ddd;padding:6px">更新时间</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid #ddd;padding:6px">600519</td><td style="border:1px solid #ddd;padding:6px">贵州茅台</td>
+          <td style="border:1px solid #ddd;padding:6px">1685.00</td><td style="border:1px solid #ddd;padding:6px">+38.68</td>
+          <td style="border:1px solid #ddd;padding:6px">+2.35%</td><td style="border:1px solid #ddd;padding:6px">1646.32</td>
+          <td style="border:1px solid #ddd;padding:6px">1648.00</td><td style="border:1px solid #ddd;padding:6px">1692.50</td>
+          <td style="border:1px solid #ddd;padding:6px">1640.00</td><td style="border:1px solid #ddd;padding:6px">1684.50</td>
+          <td style="border:1px solid #ddd;padding:6px">1685.50</td><td style="border:1px solid #ddd;padding:6px">4.2万</td>
+          <td style="border:1px solid #ddd;padding:6px">¥7.1亿</td><td style="border:1px solid #ddd;padding:6px">28.5</td>
+          <td style="border:1px solid #ddd;padding:6px">1.23</td><td style="border:1px solid #ddd;padding:6px">¥2.1万亿</td>
+          <td style="border:1px solid #ddd;padding:6px">¥2.1万亿</td><td style="border:1px solid #ddd;padding:6px">0.38%</td>
+          <td style="border:1px solid #ddd;padding:6px">15:00:00</td><td style="border:1px solid #ddd;padding:6px">2026-05-04</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros"><h4>问题</h4><ul><li>20列字段过多，信息过载</li><li>纯白底无视觉层次</li><li>涨跌无颜色区分</li><li>无搜索提示/筛选</li><li>移动端完全不可用</li><li>分页固定在底部遮挡内容</li></ul></div>
+  <div class="cons"><h4>仅有的优点</h4><ul><li>数据完整，什么字段都有</li></ul></div>
+</div>

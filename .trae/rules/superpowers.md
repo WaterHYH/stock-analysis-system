@@ -61,36 +61,24 @@ mvn clean package -DskipTests
 scp -i $env:USERPROFILE\.ssh\stock_deploy_temp target\demo-0.0.1-SNAPSHOT.jar root@120.76.43.179:/var/www/stock/app/
 ```
 
-**3. 服务器重启：** 先上传 restart.sh 脚本再执行（避免 PowerShell 引号转义问题）
+**3. 服务器重启（systemctl）：**
 ```powershell
-scp -i $env:USERPROFILE\.ssh\stock_deploy_temp restart.sh root@120.76.43.179:/var/www/stock/app/
-ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "bash /var/www/stock/app/restart.sh"
-```
-
-`restart.sh` 内容：
-```bash
-#!/bin/bash
-pkill -9 -f demo-0.0.1-SNAPSHOT.jar 2>/dev/null
-sleep 2
-cd /var/www/stock/app
-nohup java -jar demo-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-sleep 12
-grep -E "Started StockApplication|APPLICATION FAILED" app.log | tail -2
+ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "systemctl restart stock.service; sleep 12; systemctl is-active stock.service"
 ```
 
 **4. 验证服务器启动成功：**
 ```powershell
-ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "sleep 10; tail -30 /var/www/stock/app/app.log"
+ssh -i $env:USERPROFILE\.ssh\stock_deploy_temp root@120.76.43.179 "grep 'Started StockApplication' /var/www/stock/app/app.log | tail -1; curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/test"
 ```
 
-检查 `restart.sh` 输出中出现 `Started StockApplication` 且无 `APPLICATION FAILED TO START` 错误，则服务器运行成功。如果启动失败，根据错误日志继续修改代码。**
+检查输出中出现 `Started StockApplication` 且 `http_code=200`，则服务器运行成功。如果 `is-active` 返回 `failed` 或 `inactive`，或 HTTP 返回非 200，则启动失败，继续修改。**
 
 ## 故障处理
 
 当服务器部署失败时：
-1. 检查服务器 jar 是否正确：`ssh ... "ls -la /var/www/stock/app/demo-0.0.1-SNAPSHOT.jar"`
-2. 检查 jar 中关键类是否存在：`ssh ... "jar tf /var/www/stock/app/demo-0.0.1-SNAPSHOT.jar | grep StockMapper"`
-3. 查看完整错误日志：`ssh ... "tail -50 /var/www/stock/app/app.log"`
+1. 检查服务状态：`ssh ... "systemctl status stock.service --no-pager"`
+2. 查看日志：`ssh ... "journalctl -u stock.service --no-pager -n 30"`
+3. 手动重启：`ssh ... "systemctl daemon-reload; systemctl restart stock.service"`
 4. 本地重新 `mvn clean compile` 验证后再打包部署
 
 
