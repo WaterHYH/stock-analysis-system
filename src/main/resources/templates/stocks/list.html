@@ -8,8 +8,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: #0f0f1a;
-            color: #e0e0e0;
+            background: #f5f6fa;
+            color: #333;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
             min-height: 100vh;
             padding-bottom: 100px;
@@ -19,14 +19,15 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: #13132b;
-            border-bottom: 1px solid #1e1e3a;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
             padding: 12px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
             flex-wrap: wrap;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
 
         .top-bar form {
@@ -36,9 +37,9 @@
         }
 
         .top-bar input[type="text"] {
-            background: #1a1a35;
-            border: 1px solid #2a2a50;
-            color: #e0e0e0;
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            color: #333;
             padding: 8px 14px;
             border-radius: 6px;
             font-size: 14px;
@@ -52,7 +53,7 @@
         }
 
         .top-bar input[type="text"]::placeholder {
-            color: #666;
+            color: #999;
         }
 
         .btn-search {
@@ -72,7 +73,7 @@
 
         .top-bar .meta-info {
             font-size: 12px;
-            color: #888;
+            color: #999;
         }
 
         .card-list {
@@ -84,17 +85,18 @@
         .stock-card {
             display: flex;
             align-items: stretch;
-            background: #1a1a2e;
+            background: #fff;
             border-radius: 10px;
             margin-bottom: 10px;
             overflow: hidden;
             transition: transform 0.15s, box-shadow 0.15s;
             cursor: default;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         .stock-card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.10);
         }
 
         .card-stripe {
@@ -105,7 +107,7 @@
 
         .card-stripe.up   { background: #e94560; }
         .card-stripe.down { background: #4caf50; }
-        .card-stripe.flat { background: #555; }
+        .card-stripe.flat { background: #bbb; }
 
         .card-body {
             flex: 1;
@@ -123,13 +125,13 @@
         .card-symbol {
             font-size: 14px;
             font-weight: 600;
-            color: #e0e0e0;
+            color: #333;
             letter-spacing: 0.5px;
         }
 
         .card-name {
             font-size: 13px;
-            color: #a0a0b0;
+            color: #666;
         }
 
         .market-tag {
@@ -140,19 +142,19 @@
         }
 
         .market-tag.sh {
-            background: #2a1a1a;
+            background: #fff0f0;
             color: #e94560;
         }
 
         .market-tag.sz {
-            background: #1a2a1a;
+            background: #f0fff0;
             color: #4caf50;
         }
 
         .card-time {
             margin-left: auto;
             font-size: 11px;
-            color: #666;
+            color: #999;
         }
 
         .card-price-row {
@@ -170,7 +172,7 @@
 
         .card-price.up   { color: #e94560; }
         .card-price.down { color: #4caf50; }
-        .card-price.flat { color: #ccc; }
+        .card-price.flat { color: #999; }
 
         .card-change-badge {
             font-size: 14px;
@@ -181,18 +183,18 @@
         }
 
         .card-change-badge.up {
-            background: rgba(233, 69, 96, 0.15);
+            background: rgba(233, 69, 96, 0.10);
             color: #e94560;
         }
 
         .card-change-badge.down {
-            background: rgba(76, 175, 80, 0.15);
+            background: rgba(76, 175, 80, 0.10);
             color: #4caf50;
         }
 
         .card-change-badge.flat {
-            background: rgba(136, 136, 136, 0.10);
-            color: #888;
+            background: rgba(0, 0, 0, 0.05);
+            color: #999;
         }
 
         .card-change-amount {
@@ -201,17 +203,17 @@
 
         .card-change-amount.up   { color: #e94560; }
         .card-change-amount.down { color: #4caf50; }
-        .card-change-amount.flat { color: #888; }
+        .card-change-amount.flat { color: #999; }
 
         .card-meta-row {
             display: flex;
             gap: 24px;
             font-size: 12px;
-            color: #888;
+            color: #999;
         }
 
         .card-meta-row span strong {
-            color: #b0b0b0;
+            color: #666;
             font-weight: 500;
             margin-right: 4px;
         }
@@ -221,8 +223,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #13132b;
-            border-top: 1px solid #1e1e3a;
+            background: #fff;
+            border-top: 1px solid #e8e8e8;
             padding: 12px 20px;
             display: flex;
             align-items: center;
@@ -230,6 +232,7 @@
             gap: 4px;
             z-index: 100;
             flex-wrap: wrap;
+            box-shadow: 0 -1px 4px rgba(0,0,0,0.04);
         }
 
         .pagination a,
@@ -243,15 +246,15 @@
             border-radius: 6px;
             font-size: 13px;
             text-decoration: none;
-            color: #a0a0b0;
-            background: #1a1a35;
+            color: #666;
+            background: #f0f0f0;
             transition: all 0.15s;
             flex-shrink: 0;
         }
 
         .pagination a:hover {
-            background: #2a2a50;
-            color: #e0e0e0;
+            background: #e8e8e8;
+            color: #333;
         }
 
         .pagination a.current,
@@ -272,13 +275,13 @@
             gap: 4px;
             margin-left: 12px;
             font-size: 12px;
-            color: #888;
+            color: #999;
         }
 
         .jump-box input[type="number"] {
-            background: #1a1a35;
-            border: 1px solid #2a2a50;
-            color: #e0e0e0;
+            background: #f0f0f0;
+            border: 1px solid #d0d0d0;
+            color: #333;
             padding: 6px 8px;
             border-radius: 5px;
             width: 50px;
@@ -292,8 +295,8 @@
         }
 
         .jump-box .btn-go {
-            background: #2a2a50;
-            color: #e0e0e0;
+            background: #e8e8e8;
+            color: #333;
             border: none;
             padding: 6px 12px;
             border-radius: 5px;
@@ -304,23 +307,24 @@
 
         .jump-box .btn-go:hover {
             background: #e94560;
+            color: white;
         }
 
         .page-size-info {
             margin-left: 12px;
             font-size: 12px;
-            color: #666;
+            color: #999;
         }
 
         .pg-ellipsis {
-            color: #555;
+            color: #bbb;
             font-size: 14px;
             padding: 0 2px;
         }
 
         .version-sep {
             margin: 0 6px;
-            color: #555;
+            color: #ccc;
         }
 
         @media (max-width: 768px) {
